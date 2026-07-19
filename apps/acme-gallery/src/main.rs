@@ -1,22 +1,27 @@
 use acme_ui::{
-    AboutDialog, Accordion, ActiveTheme, Alert, AnnotationLayer, AppMenuBar, AreaChart, Autocomplete, Avatar,
-    AvatarGroup, Badge, BarChart, BarEntry, Breadcrumb, Button, Calendar, Candlestick, CandlestickChart, Canvas, Card, Carousel, ChartColors, ChartSeries,
-    Checkbox, Collapsible, ColorPicker, Combobox, ComboboxOption, CommandPalette, ContextToolbar,
-    Cropper, DataGrid, DataGridColumn, DataGridRow, DatePicker, DateRangePicker, Dialog,
-    DiffViewer, Direction, Dock, DockArea, DockPanel, DocumentOutline, DonutChart, DragRegion, Drawer,
-    DropZone, EmptyState, ErrorState, Field, FieldShell, FilePicker, FindReplace, FocusRing,
-    FocusScope, Form, FormMessage, Gauge, Grid, Heatmap, HeatmapCell, HexViewer, Histogram, HistogramBin, HtmlView, Icon, IconButton, IconName,
-    ImageView, InspectorPanel, Kbd, Label, Lightbox, LineNumbers, List, ListItem, LogLevel,
-    Legend, LegendItem, LegendLayout, LineChart, LogViewer, Markdown, MarkdownPreview, MaskedInput, Menu, MenuItem, MultiSelect, NavigationRail,
-    NavigationView, NumberInput, Pagination, PanView, PasswordInput, PieChart, PieSlice, PinInput, Popover, Progress,
-    PropertyGrid, Radio, RadioGroup, RangeSlider, Rating, Resizable, ResizeHandle, RichText,
-    ScatterChart, ScatterPoint, ScatterSeries, ScrollArea, SearchInput, SegmentedControl, Select, SelectOption, Separator, SettingsGroup,
-    SettingsPage, SettingsRow, ShortcutManager, Sidebar, Size, Skeleton, Slider, SortDirection, Sparkline,
-    Spinner, SplitView, Stack, StatusBar, Stepper, StreamingChart, StyledExt, Switch, SystemTray, Table,
-    TableColumn, Tabs, Tag, TextInput, Textarea, Theme, ThemeMode, ThumbnailStrip, Tile,
-    TileDirection, Tiles, TimePicker, TitleBar, ToggleButton, Tone, Toolbar, Tooltip, Tree,
-    TreeNode, WindowOverlay, ZoomView, hsl, validators,
+    AboutDialog, Accordion, ActiveTheme, Alert, AnnotationLayer, AppMenuBar, AreaChart,
+    Autocomplete, Avatar, AvatarGroup, Badge, BarChart, BarEntry, Breadcrumb, Button, Calendar,
+    Candlestick, CandlestickChart, Canvas, Card, Carousel, ChartColors, ChartSeries, Checkbox,
+    ClickOutsideListener, Collapsible, ColorPicker, Combobox, ComboboxOption, CommandPalette,
+    ContextToolbar, Cropper, DataGrid, DataGridColumn, DataGridRow, DatePicker, DateRangePicker,
+    Dialog, DiffViewer, Direction, Dock, DockArea, DockPanel, DocumentOutline, DonutChart,
+    DragRegion, Drawer, DropZone, EmptyState, ErrorState, Field, FieldShell, FilePicker,
+    FindReplace, FocusRing, FocusScope, FocusTrap, Form, FormMessage, Gauge, Grid, Heatmap,
+    HeatmapCell, HexViewer, Histogram, HistogramBin, HtmlView, Icon, IconButton, IconName,
+    ImageView, InspectorPanel, Kbd, Label, Legend, LegendItem, LegendLayout, Lightbox, LineChart,
+    LineNumbers, List, ListItem, LogLevel, LogViewer, Markdown, MarkdownPreview, MaskedInput, Menu,
+    MenuItem, ModalBackdrop, MultiSelect, NavigationRail, NavigationView, NumberInput,
+    OverlayDepth, Pagination, PanView, PasswordInput, PieChart, PieSlice, PinInput, Popover,
+    Progress, PropertyGrid, Radio, RadioGroup, RangeSlider, Rating, Resizable, ResizeHandle,
+    RichText, ScatterChart, ScatterPoint, ScatterSeries, ScrollArea, SearchInput, SegmentedControl,
+    Select, SelectOption, Separator, SettingsGroup, SettingsPage, SettingsRow, ShortcutManager,
+    Sidebar, Size, Skeleton, Slider, SortDirection, Sparkline, Spinner, SplitView, Stack,
+    StatusBar, Stepper, StreamingChart, StyledExt, Switch, SystemTray, Table, TableColumn, Tabs,
+    Tag, TextInput, Textarea, Theme, ThemeMode, ThumbnailStrip, Tile, TileDirection, Tiles,
+    TimePicker, TitleBar, ToggleButton, Tone, Toolbar, Tooltip, Tree, TreeNode, WindowOverlay,
+    ZoomView, hsl, render_disabled_overlay, render_loading_overlay, sr_only_label, validators,
 };
+use gpui::prelude::FluentBuilder;
 use gpui::{
     AppContext as _, Context, ElementId, Entity, InteractiveElement as _, IntoElement,
     ParentElement as _, Render, SharedString, StatefulInteractiveElement as _, Styled as _, Window,
@@ -53,6 +58,11 @@ struct Gallery {
     table_sort_dir: SortDirection,
     // V9 state
     data_grid_entity: Entity<DataGrid>,
+    // P2 Infrastructure state
+    states_loading: bool,
+    states_disabled: bool,
+    focus_trap_active: bool,
+    modal_backdrop_open: bool,
 }
 
 impl Gallery {
@@ -151,6 +161,11 @@ impl Gallery {
             combobox_entity,
             resizable_entity,
             data_grid_entity,
+            states_loading: false,
+            states_disabled: false,
+
+            focus_trap_active: false,
+            modal_backdrop_open: false,
             select_open: false,
             select_selected: None,
             pagination_current: 1,
@@ -264,7 +279,7 @@ impl Render for Gallery {
                         div()
                             .text_size(px(11.))
                             .text_color(c.muted_foreground)
-                            .child("V2–V5 — All 37 components"),
+                            .child("V2–V10 + P2 Charts + Infrastructure"),
                     ),
             )
             .child(
@@ -1468,7 +1483,454 @@ impl Render for Gallery {
             .child(div().child("AnnotationLayer (V10):"))
             .child(AnnotationLayer::new("ann-demo").add("Note 1", 20., 10.).add("Note 2", 100., 40.));
 
-        // ── P2 Charts card ──
+        // ── P2 Infrastructure: States card ──
+
+        let states_card = Card::new()
+            .title("P2 States")
+            .description("Loading overlay, disabled state, validation, AriaLabel, sr-only label, StateStyling trait")
+            // Loading overlay
+            .child(Separator::new())
+            .child(div().child("Loading Overlay:"))
+            .child(
+                Button::new("toggle-loading")
+                    .extra_small()
+                    .secondary()
+                    .label(if self.states_loading { "Hide" } else { "Show" })
+                    .on_click(cx.listener(|this, _, _, cx| {
+                        this.states_loading = !this.states_loading;
+                        cx.notify();
+                    })),
+            )
+            .child(
+                if self.states_loading {
+                    render_loading_overlay(cx, Some("Loading...".into()))
+                } else {
+                    render_loading_overlay(cx, None)
+                },
+            )
+            // Disabled overlay
+            .child(Separator::new())
+            .child(div().child("Disabled Overlay:"))
+            .child(
+                Button::new("toggle-disabled")
+                    .extra_small()
+                    .secondary()
+                    .label(if self.states_disabled { "Enabled" } else { "Disabled" })
+                    .on_click(cx.listener(|this, _, _, cx| {
+                        this.states_disabled = !this.states_disabled;
+                        cx.notify();
+                    })),
+            )
+            .child(render_disabled_overlay())
+            // Validation border
+            .child(Separator::new())
+            .child(div().child("Validation border color:"))
+            .child(
+                div()
+                    .flex()
+                    .gap_3()
+                    .child(
+                        div()
+                            .rounded(cx.theme().radius)
+                            .px_3()
+                            .py_1()
+                            .border_1()
+                            .border_color(c.success)
+                            .child("Valid"),
+                    )
+                    .child(
+                        div()
+                            .rounded(cx.theme().radius)
+                            .px_3()
+                            .py_1()
+                            .border_1()
+                            .border_color(c.danger)
+                            .child("Invalid"),
+                    ),
+            )
+            // State styling (disabled vs normal buttons)
+            .child(Separator::new())
+            .child(div().child("State styling:"))
+            .child(
+                div()
+                    .flex()
+                    .gap_2()
+                    .child(
+                        Button::new("styling-normal")
+                            .extra_small()
+                            .label("Normal"),
+                    )
+                    .child(
+                        Button::new("styling-disabled")
+                            .extra_small()
+                            .label("Disabled")
+                            .disabled(true),
+                    )
+                    .child(
+                        Button::new("styling-danger")
+                            .extra_small()
+                            .danger()
+                            .label("Danger"),
+                    )
+                    .child(
+                        Button::new("styling-primary")
+                            .extra_small()
+                            .primary()
+                            .label("Primary"),
+                    ),
+            )
+            // sr-only label
+            .child(Separator::new())
+            .child(div().child("SR-only label (inspect DOM):"))
+            .child(sr_only_label("Hidden screen reader text"));
+
+        // ── P2 Infrastructure: Accessibility card ──
+
+        let reduced_motion = false; // prefers_reduced_motion requires Window + App
+
+        let access_card = Card::new()
+            .title("P2 Accessibility")
+            .description("AriaRole, AriaAttrs, reduced-motion query, focus ring style")
+            // AriaRole
+            .child(Separator::new())
+            .child(div().child("AriaRole variants:"))
+            .child(
+                div()
+                    .flex()
+                    .flex_wrap()
+                    .gap_2()
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .text_size(px(11.))
+                            .child("Button"),
+                    )
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .text_size(px(11.))
+                            .child("Dialog"),
+                    )
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .text_size(px(11.))
+                            .child("Alert"),
+                    )
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .text_size(px(11.))
+                            .child("TabPanel"),
+                    )
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .text_size(px(11.))
+                            .child("Tooltip"),
+                    )
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .text_size(px(11.))
+                            .child("Menu"),
+                    ),
+            )
+            // AriaAttrs builder
+            .child(Separator::new())
+            .child(div().child("AriaAttrs builder (API reference):"))
+            .child(
+                div()
+                    .v_flex()
+                    .gap_1()
+                    .text_size(px(11.))
+                    .text_color(c.muted_foreground)
+                    .child("40+ ARIA roles: Button, Dialog, Alert, TabPanel, Tooltip, Menu, …")
+                    .child("17 ARIA attributes: label, describedby, expanded, pressed, …"),
+            )
+            // Reduced motion
+            .child(Separator::new())
+            .child(div().child("Reduced motion preference:"))
+            .child(
+                div()
+                    .text_size(px(11.))
+                    .text_color(if reduced_motion { c.warning } else { c.success })
+                    .child(if reduced_motion {
+                        "Reduced motion requested"
+                    } else {
+                        "No reduced motion preference"
+                    }),
+            )
+            // Focus ring style
+            .child(Separator::new())
+            .child(div().child("Focus ring style:"))
+            .child(
+                div()
+                    .text_size(px(11.))
+                    .text_color(c.muted_foreground)
+                    .child("Use focus_ring_style(cx) to get (width, color) at runtime"),
+            );
+
+        // ── P2 Infrastructure: Focus card ──
+
+        let focus_card = Card::new()
+            .title("P2 Focus")
+            .description("FocusTrap, RovingTabIndex, keyboard handlers, DefaultCancelButtons")
+            // FocusTrap
+            .child(Separator::new())
+            .child(div().child("FocusTrap:"))
+            .child(
+                Button::new("toggle-focustrap")
+                    .extra_small()
+                    .secondary()
+                    .label(if self.focus_trap_active {
+                        "Trap Active"
+                    } else {
+                        "Trap Inactive"
+                    })
+                    .on_click(cx.listener(|this, _, _, cx| {
+                        this.focus_trap_active = !this.focus_trap_active;
+                        cx.notify();
+                    })),
+            )
+            .child(
+                FocusTrap::new("demo-focus-trap")
+                    .active(self.focus_trap_active)
+                    .child(
+                        div()
+                            .flex()
+                            .gap_2()
+                            .p_2()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .child(Button::new("ft-btn-1").extra_small().label("Btn 1"))
+                            .child(Button::new("ft-btn-2").extra_small().label("Btn 2"))
+                            .child(Button::new("ft-btn-3").extra_small().label("Btn 3")),
+                    ),
+            )
+            // RovingTabIndex
+            .child(Separator::new())
+            .child(div().child("RovingTabIndex demo:"))
+            .child(
+                div()
+                    .flex()
+                    .gap_2()
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .rounded(cx.theme().radius)
+                            .bg(c.surface)
+                            .border_1()
+                            .border_color(c.border)
+                            .child("Item A"),
+                    )
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .rounded(cx.theme().radius)
+                            .bg(c.surface)
+                            .border_1()
+                            .border_color(c.ring)
+                            .child("Item B (focused)"),
+                    )
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .rounded(cx.theme().radius)
+                            .bg(c.surface)
+                            .border_1()
+                            .border_color(c.border)
+                            .child("Item C"),
+                    ),
+            )
+            // Keyboard handlers
+            .child(Separator::new())
+            .child(div().child("Keyboard handlers:"))
+            .child(
+                div()
+                    .v_flex()
+                    .gap_2()
+                    .child(
+                        Button::new("demo-escape")
+                            .extra_small()
+                            .secondary()
+                            .label("Press Escape → callback")
+                            .on_click(cx.listener(|_, _, _, _| {})),
+                    )
+                    .child(
+                        div()
+                            .text_size(px(10.))
+                            .text_color(c.muted_foreground)
+                            .child("escape_close_handler() / arrow_key_nav_handler() for on_key_down"),
+                    ),
+            )
+            // DefaultCancelButtons
+            .child(Separator::new())
+            .child(div().child("DefaultCancelButtons:"))
+            .child(
+                div()
+                    .flex()
+                    .gap_2()
+                    .child(Button::new("dflt-ok").extra_small().primary().label("OK"))
+                    .child(Button::new("dflt-cancel").extra_small().secondary().label("Cancel")),
+            );
+
+        // ── P2 Infrastructure: Overlay card ──
+
+        let overlay_card = Card::new()
+            .title("P2 Overlay")
+            .description("ModalBackdrop, OverlayDepth, AutoPositioner, ClickOutsideListener, FocusRestore")
+            // ModalBackdrop
+            .child(Separator::new())
+            .child(div().child("ModalBackdrop:"))
+            .child(
+                Button::new("toggle-backdrop")
+                    .extra_small()
+                    .secondary()
+                    .label(if self.modal_backdrop_open {
+                        "Hide Backdrop"
+                    } else {
+                        "Show Backdrop"
+                    })
+                    .on_click(cx.listener(|this, _, _, cx| {
+                        this.modal_backdrop_open = !this.modal_backdrop_open;
+                        cx.notify();
+                    })),
+            )
+            .child(
+                div()
+                    .h(px(80.))
+                    .relative()
+                    .bg(c.surface)
+                    .rounded(cx.theme().radius)
+                    .child(
+                        div().p_2().text_size(px(11.)).text_color(c.muted_foreground)
+                            .child(if self.modal_backdrop_open {
+                                "Backdrop visible"
+                            } else {
+                                "Click 'Show Backdrop' above"
+                            }),
+                    )
+                    .when(self.modal_backdrop_open, |this| {
+                        this.child(ModalBackdrop::new("demo-backdrop").depth(OverlayDepth::Modal))
+                    }),
+            )
+            // OverlayDepth
+            .child(Separator::new())
+            .child(div().child("OverlayDepth z-index layers:"))
+            .child(
+                div()
+                    .v_flex()
+                    .gap_1()
+                    .text_size(px(11.))
+                    .text_color(c.muted_foreground)
+                    .child("Popover=100  Drawer=200  Dialog=300  Modal=400  Toast=500  DragDrop=600"),
+            )
+            // AutoPositioner
+            .child(Separator::new())
+            .child(div().child("AutoPositioner placements:"))
+            .child(
+                div()
+                    .flex()
+                    .flex_wrap()
+                    .gap_2()
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .child("Bottom"),
+                    )
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .child("Top"),
+                    )
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .child("Left"),
+                    )
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .child("Right"),
+                    )
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .child("BottomStart"),
+                    )
+                    .child(
+                        div()
+                            .px_2()
+                            .py_1()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .child("TopEnd"),
+                    ),
+            )
+            // ClickOutsideListener
+            .child(Separator::new())
+            .child(div().child("ClickOutsideListener:"))
+            .child(
+                ClickOutsideListener::new("demo-outside")
+                    .child(
+                        div()
+                            .bg(c.surface)
+                            .rounded(cx.theme().radius)
+                            .p_3()
+                            .text_size(px(11.))
+                            .text_color(c.muted_foreground)
+                            .child("Click outside this box"),
+                    ),
+            )
+            // FocusRestore
+            .child(Separator::new())
+            .child(div().child("FocusRestore:"))
+            .child(
+                div()
+                    .v_flex()
+                    .gap_1()
+                    .text_size(px(11.))
+                    .text_color(c.muted_foreground)
+                    .child("FocusRestore saves and restores focus for overlay show/hide lifecycle")
+                    .child("Used internally by Dialog, Drawer, Popover"),
+            );
 
         let p2_charts_card = Card::new()
             .title("P2 Charts")
@@ -1716,6 +2178,14 @@ impl Render for Gallery {
                     .child(v9_card)
                     // V10 row
                     .child(v10_card)
+                    // P2 Infrastructure row
+                    .child(states_card)
+                    // P2 Infrastructure row
+                    .child(access_card)
+                    // P2 Infrastructure row
+                    .child(focus_card)
+                    // P2 Infrastructure row
+                    .child(overlay_card)
                     // P2 Charts row
                     .child(p2_charts_card)
                     // V2 row

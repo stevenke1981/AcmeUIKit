@@ -5,6 +5,7 @@ mod styled;
 mod theme;
 
 pub mod about_dialog;
+pub mod accessibility;
 pub mod accordion;
 pub mod alert;
 pub mod annotation_layer;
@@ -45,6 +46,7 @@ pub mod error_state;
 pub mod field;
 pub mod file_picker;
 pub mod find_replace;
+pub mod focus;
 pub mod focus_ring;
 pub mod focus_scope;
 pub mod form;
@@ -77,6 +79,7 @@ pub mod navigation_rail;
 pub mod navigation_view;
 pub mod notification;
 pub mod number_input;
+pub mod overlay_manager;
 pub mod pagination;
 pub mod pan_view;
 pub mod password_input;
@@ -106,6 +109,7 @@ pub mod sparkline;
 pub mod spinner;
 pub mod split_view;
 pub mod stack;
+pub mod states;
 pub mod status_bar;
 pub mod stepper;
 pub mod streaming_chart;
@@ -134,6 +138,10 @@ pub use styled::StyledExt;
 pub use theme::{ActiveTheme, FontSizes, Spacing, Theme, ThemeColors, ThemeMode, hsl};
 
 pub use about_dialog::AboutDialog;
+pub use accessibility::{
+    AriaAttrs, AriaChecked, AriaLive, AriaPopup, AriaPressed, AriaRole,
+    animation_duration_multiplier, focus_ring_style, prefers_high_contrast, prefers_reduced_motion,
+};
 pub use accordion::Accordion;
 pub use alert::Alert;
 pub use annotation_layer::{Annotation, AnnotationLayer};
@@ -177,6 +185,10 @@ pub use error_state::ErrorState;
 pub use field::FieldShell;
 pub use file_picker::FilePicker;
 pub use find_replace::FindReplace;
+pub use focus::{
+    DefaultCancelButtons, FocusTrap, RovingOrientation, RovingTabIndex, arrow_key_nav_handler,
+    escape_close_handler,
+};
 pub use focus_ring::FocusRing;
 pub use focus_scope::FocusScope;
 pub use form::validators;
@@ -211,6 +223,10 @@ pub use navigation_rail::NavigationRail;
 pub use navigation_view::NavigationView;
 pub use notification::{NotificationLevel, Notifications};
 pub use number_input::NumberInput;
+pub use overlay_manager::{
+    AutoPositioner, ClickOutsideListener, FocusRestore, ModalBackdrop, OverlayDepth, OverlayEntry,
+    Placement,
+};
 pub use pagination::Pagination;
 pub use pan_view::PanView;
 pub use password_input::PasswordInput;
@@ -240,6 +256,10 @@ pub use sparkline::Sparkline;
 pub use spinner::Spinner;
 pub use split_view::SplitView;
 pub use stack::Stack;
+pub use states::{
+    StateStyling, aria_label, disabled_opacity, render_disabled_overlay, render_loading_overlay,
+    sr_only_label, validation_border_color,
+};
 pub use status_bar::StatusBar;
 pub use stepper::Stepper;
 pub use streaming_chart::StreamingChart;
