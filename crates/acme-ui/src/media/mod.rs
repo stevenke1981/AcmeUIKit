@@ -1,0 +1,23 @@
+//! media module.
+
+pub mod annotation_layer;
+pub mod avatar_group;
+pub mod canvas;
+pub mod carousel;
+pub mod cropper;
+pub mod diff_viewer;
+pub mod document_outline;
+pub mod find_replace;
+pub mod hex_viewer;
+pub mod html_view;
+pub mod image;
+pub mod image_viewer;
+pub mod lightbox;
+pub mod line_numbers;
+pub mod log_viewer;
+pub mod markdown;
+pub mod markdown_preview;
+pub mod pan_view;
+pub mod rich_text;
+pub mod thumbnail_strip;
+pub mod zoom_view;

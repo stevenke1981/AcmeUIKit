@@ -1,0 +1,24 @@
+//! foundations module.
+
+pub mod accordion;
+pub mod alert;
+pub mod avatar;
+pub mod badge;
+pub mod button;
+pub mod card;
+pub mod empty_state;
+pub mod error_state;
+pub mod icon_button;
+pub mod icons;
+pub mod kbd;
+pub mod label;
+pub mod loading_state;
+pub mod primitives;
+pub mod progress;
+pub mod separator;
+pub mod skeleton;
+pub mod spinner;
+pub mod styled;
+pub mod switch;
+pub mod tag;
+pub mod theme;

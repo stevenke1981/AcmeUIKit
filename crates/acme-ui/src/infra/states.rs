@@ -30,7 +30,7 @@ pub fn render_loading_overlay(cx: &App, message: Option<SharedString>) -> gpui::
                 .v_flex()
                 .items_center()
                 .gap_2()
-                .child(crate::spinner::Spinner::new().size(crate::Size::Medium))
+                .child(crate::foundations::spinner::Spinner::new().size(crate::Size::Medium))
                 .when_some(message, |this, msg| {
                     this.child(
                         gpui::div()
