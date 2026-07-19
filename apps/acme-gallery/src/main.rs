@@ -1,10 +1,11 @@
 use acme_ui::{
-    ActiveTheme, Badge, BarChart, BarEntry, Button, Card, Checkbox, Combobox, ComboboxOption,
-    Dialog, Direction, Dock, DockArea, DockPanel, Field, FieldShell, Form, Icon, IconName,
-    Markdown, Menu, MenuItem, Pagination, Popover, Progress, Radio, RadioGroup, Resizable, Select,
-    SelectOption, Separator, SettingsGroup, SettingsPage, SettingsRow, Sidebar, Skeleton,
-    SortDirection, StyledExt, Switch, Table, TableColumn, Tabs, TextInput, Textarea, Theme,
-    ThemeMode, Tile, TileDirection, Tiles, Tooltip, Tree, TreeNode, hsl, validators,
+    ActiveTheme, Alert, Avatar, Badge, BarChart, BarEntry, Breadcrumb, Button, Card, Checkbox,
+    Combobox, ComboboxOption, Dialog, Direction, Dock, DockArea, DockPanel, Field, FieldShell,
+    Form, Icon, IconName, Kbd, List, ListItem, Markdown, Menu, MenuItem, Pagination, Popover,
+    Progress, Radio, RadioGroup, Resizable, Select, SelectOption, Separator, SettingsGroup,
+    SettingsPage, SettingsRow, Sidebar, Size, Skeleton, Slider, SortDirection, Stepper, StyledExt,
+    Switch, Table, TableColumn, Tabs, Tag, TextInput, Textarea, Theme, ThemeMode, Tile,
+    TileDirection, Tiles, Tone, Toolbar, Tooltip, Tree, TreeNode, hsl, validators,
 };
 use gpui::{
     AppContext as _, Context, ElementId, Entity, InteractiveElement as _, IntoElement,
@@ -199,7 +200,7 @@ impl Render for Gallery {
                         div()
                             .text_size(px(11.))
                             .text_color(c.muted_foreground)
-                            .child("V2 — Editable inputs, overlays, menus, icons"),
+                            .child("V2–V5 — All 37 components"),
                     ),
             )
             .child(
@@ -1035,6 +1036,95 @@ impl Render for Gallery {
                     ),
             );
 
+        // ── V5 Utils card ──
+
+        let v5_card = Card::new()
+            .title("V5 Utility Components")
+            .description("Alert, Tag, Slider, Avatar, Breadcrumb, Stepper, Toolbar, List, Kbd")
+            // Alert
+            .child(Separator::new())
+            .child(div().child("Alert (V5):"))
+            .child(
+                div().v_flex().gap_2()
+                    .child(Alert::new("Information message").tone(Tone::Primary))
+                    .child(Alert::new("Operation successful!").tone(Tone::Success))
+                    .child(Alert::new("Warning: disk space low").tone(Tone::Warning))
+                    .child(Alert::new("Error: connection failed").tone(Tone::Danger))
+            )
+            // Tag
+            .child(Separator::new())
+            .child(div().child("Tag (V5):"))
+            .child(
+                div().h_flex().gap_2()
+                    .child(Tag::new("Rust"))
+                    .child(Tag::new("TypeScript").color(hsl(210., 0.73, 0.48)))
+                    .child(Tag::new("Python").color(hsl(120., 0.55, 0.45)))
+                    .child(Tag::new("Filter").removable(true))
+            )
+            // Slider
+            .child(Separator::new())
+            .child(div().child("Slider (V5):"))
+            .child(Slider::new("demo-slider").value(0.65).min(0.0).max(1.0))
+            // Avatar
+            .child(Separator::new())
+            .child(div().child("Avatar (V5):"))
+            .child(
+                div().h_flex().gap_3().items_center()
+                    .child(Avatar::new("Alice Wang"))
+                    .child(Avatar::new("Bob Chen").size(Size::Small))
+                    .child(Avatar::new("Charlie Li").size(Size::Large))
+                    .child(Avatar::new("Diana"))
+            )
+            // Breadcrumb
+            .child(Separator::new())
+            .child(div().child("Breadcrumb (V5):"))
+            .child(
+                Breadcrumb::new()
+                    .item("Home")
+                    .item("Products")
+                    .item("Widgets")
+            )
+            // Stepper
+            .child(Separator::new())
+            .child(div().child("Stepper (V5):"))
+            .child(
+                Stepper::new()
+                    .step("Cart")
+                    .step("Shipping")
+                    .step("Payment")
+                    .step("Confirm")
+                    .active_step(2)
+            )
+            // Toolbar
+            .child(Separator::new())
+            .child(div().child("Toolbar (V5):"))
+            .child(
+                Toolbar::new()
+                    .child(Button::new("tb-save").extra_small().primary().label("Save"))
+                    .child(Button::new("tb-edit").extra_small().secondary().label("Edit"))
+                    .separator()
+                    .child(Button::new("tb-delete").extra_small().danger().label("Delete"))
+            )
+            // List
+            .child(Separator::new())
+            .child(div().child("List (V5):"))
+            .child(
+                List::new("demo-list")
+                    .item(ListItem::new("Apple").description("A sweet red fruit"))
+                    .item(ListItem::new("Banana").description("A yellow curved fruit").selected(true))
+                    .item(ListItem::new("Cherry").description("A small stone fruit"))
+                    .item(ListItem::new("Grapefruit").disabled(true).description("Citrus fruit"))
+            )
+            // Kbd
+            .child(Separator::new())
+            .child(div().child("Kbd / Shortcut (V5):"))
+            .child(
+                div().h_flex().gap_2()
+                    .child(Kbd::new("⌘K"))
+                    .child(Kbd::new("⌘⇧P"))
+                    .child(Kbd::new("Ctrl+S"))
+            );
+
         // ── V2 Icons card ──
 
         let icons_card = Card::new()
@@ -1150,6 +1240,8 @@ impl Render for Gallery {
                     .child(v3_card)
                     // V4 row
                     .child(v4_card)
+                    // V5 row
+                    .child(v5_card)
                     // V2 row
                     .child(icons_card)
                     .child(notification_card),

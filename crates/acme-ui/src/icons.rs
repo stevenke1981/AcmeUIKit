@@ -16,6 +16,8 @@ pub enum IconName {
     Menu,
     /// Chevron pointing down.
     ChevronDown,
+    /// Chevron pointing left.
+    ChevronLeft,
     /// Chevron pointing right.
     ChevronRight,
     /// Information.
@@ -35,6 +37,7 @@ impl IconName {
             Self::Close => "✕",
             Self::Menu => "☰",
             Self::ChevronDown => "▼",
+            Self::ChevronLeft => "◀",
             Self::ChevronRight => "▶",
             Self::Info => "ℹ",
             Self::Warning => "⚠",
