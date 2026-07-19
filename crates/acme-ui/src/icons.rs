@@ -38,6 +38,22 @@ pub enum IconName {
     Settings,
     /// User / person.
     User,
+    /// Eye (visible).
+    Eye,
+    /// Eye off (hidden).
+    EyeOff,
+    /// Star (rating).
+    Star,
+    /// Folder.
+    Folder,
+    /// Clock / time.
+    Clock,
+    /// Arrow up.
+    ArrowUp,
+    /// Arrow down.
+    ArrowDown,
+    /// Calendar.
+    Calendar,
 }
 
 impl IconName {
@@ -58,6 +74,14 @@ impl IconName {
             Self::Minus => "−",
             Self::Settings => "⚙",
             Self::User => "👤",
+            Self::Eye => "👁",
+            Self::EyeOff => "🙈",
+            Self::Star => "★",
+            Self::Folder => "📁",
+            Self::Clock => "🕐",
+            Self::ArrowUp => "↑",
+            Self::ArrowDown => "↓",
+            Self::Calendar => "📅",
         }
     }
 }

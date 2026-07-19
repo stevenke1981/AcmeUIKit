@@ -1,14 +1,15 @@
 use acme_ui::{
-    Accordion, ActiveTheme, Alert, Avatar, Badge, BarChart, BarEntry, Breadcrumb, Button, Calendar,
-    Card, Checkbox, Collapsible, ColorPicker, Combobox, ComboboxOption, CommandPalette, DatePicker,
-    Dialog, Direction, Dock, DockArea, DockPanel, Drawer, EmptyState, ErrorState, Field,
-    FieldShell, Form, Grid, Icon, IconButton, IconName, Kbd, Label, List, ListItem, Markdown, Menu,
-    MenuItem, NumberInput, Pagination, Popover, Progress, PropertyGrid, Radio, RadioGroup,
-    Resizable, ScrollArea, SearchInput, SegmentedControl, Select, SelectOption, Separator,
-    SettingsGroup, SettingsPage, SettingsRow, Sidebar, Size, Skeleton, Slider, SortDirection,
-    Spinner, Stack, StatusBar, Stepper, StyledExt, Switch, Table, TableColumn, Tabs, Tag,
-    TextInput, Textarea, Theme, ThemeMode, Tile, TileDirection, Tiles, ToggleButton, Tone, Toolbar,
-    Tooltip, Tree, TreeNode, hsl, validators,
+    Accordion, ActiveTheme, Alert, Autocomplete, Avatar, Badge, BarChart, BarEntry, Breadcrumb,
+    Button, Calendar, Card, Checkbox, Collapsible, ColorPicker, Combobox, ComboboxOption,
+    CommandPalette, DatePicker, DateRangePicker, Dialog, Direction, Dock, DockArea, DockPanel,
+    Drawer, EmptyState, ErrorState, Field, FieldShell, FilePicker, Form, FormMessage, Grid, Icon,
+    IconButton, IconName, Kbd, Label, List, ListItem, Markdown, MaskedInput, Menu, MenuItem,
+    MultiSelect, NumberInput, Pagination, PasswordInput, PinInput, Popover, Progress, PropertyGrid,
+    Radio, RadioGroup, RangeSlider, Rating, Resizable, ScrollArea, SearchInput, SegmentedControl,
+    Select, SelectOption, Separator, SettingsGroup, SettingsPage, SettingsRow, Sidebar, Size,
+    Skeleton, Slider, SortDirection, Spinner, Stack, StatusBar, Stepper, StyledExt, Switch, Table,
+    TableColumn, Tabs, Tag, TextInput, Textarea, Theme, ThemeMode, Tile, TileDirection, Tiles,
+    TimePicker, ToggleButton, Tone, Toolbar, Tooltip, Tree, TreeNode, hsl, validators,
 };
 use gpui::{
     AppContext as _, Context, ElementId, Entity, InteractiveElement as _, IntoElement,
@@ -1200,6 +1201,58 @@ impl Render for Gallery {
             .child(div().child("PropertyGrid (V6):"))
             .child(PropertyGrid::new().property("Name", "Acme App").property("Version", "2.1.0").property("Author", "Acme Corp"));
 
+        // ── V7 P1 Input & Selection card ──
+
+        let v7_card = Card::new()
+            .title("V7 P1 Inputs & Selection")
+            .description("PasswordInput, MaskedInput, PinInput, TimePicker, DateRangePicker, FilePicker, MultiSelect, RangeSlider, Rating, FormMessage, Autocomplete")
+            // PasswordInput
+            .child(Separator::new())
+            .child(div().child("PasswordInput (V7):"))
+            .child(PasswordInput::new("pwd-demo").placeholder("Enter password"))
+            // MaskedInput
+            .child(Separator::new())
+            .child(div().child("MaskedInput (V7):"))
+            .child(MaskedInput::new("mask-phone").mask("(XXX) XXX-XXXX").value("5551234567"))
+            // PinInput
+            .child(Separator::new())
+            .child(div().child("PinInput (V7):"))
+            .child(PinInput::new("pin-demo").digits(6).value("123"))
+            // TimePicker
+            .child(Separator::new())
+            .child(div().child("TimePicker (V7):"))
+            .child(TimePicker::new("time-demo").value("14:30"))
+            // DateRangePicker
+            .child(Separator::new())
+            .child(div().child("DateRangePicker (V7):"))
+            .child(DateRangePicker::new("range-demo").from("2024-01-01").to("2024-12-31"))
+            // FilePicker
+            .child(Separator::new())
+            .child(div().child("FilePicker (V7):"))
+            .child(FilePicker::new("file-demo").path("C:/project/src/main.rs"))
+            // MultiSelect
+            .child(Separator::new())
+            .child(div().child("MultiSelect (V7):"))
+            .child(MultiSelect::new("ms-demo").items(&["Rust", "Go", "Python", "TypeScript"]).selected_items(&["Rust", "Go"]))
+            // RangeSlider
+            .child(Separator::new())
+            .child(div().child("RangeSlider (V7):"))
+            .child(RangeSlider::new("range-slider").min(0.).max(100.).low(20.).high(80.))
+            // Rating
+            .child(Separator::new())
+            .child(div().child("Rating (V7):"))
+            .child(Rating::new("score").max(5).value(3))
+            // FormMessage
+            .child(Separator::new())
+            .child(div().child("FormMessage (V7):"))
+            .child(FormMessage::new("err-msg").tone(Tone::Danger).message("This field is required"))
+            .child(FormMessage::new("warn-msg").tone(Tone::Warning).message("Please review before submitting"))
+            .child(FormMessage::new("info-msg").tone(Tone::Primary).message("All changes saved"))
+            // Autocomplete
+            .child(Separator::new())
+            .child(div().child("Autocomplete (V7):"))
+            .child(Autocomplete::new("ac-demo").value("New").suggestions(&["New York", "London", "Tokyo", "Paris"]));
+
         // ── V2 Icons card ──
 
         let icons_card = Card::new()
@@ -1319,6 +1372,8 @@ impl Render for Gallery {
                     .child(v5_card)
                     // V6 row
                     .child(v6_card)
+                    // V7 row
+                    .child(v7_card)
                     // V2 row
                     .child(icons_card)
                     .child(notification_card),
