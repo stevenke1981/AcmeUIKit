@@ -1,28 +1,51 @@
 use acme_ui::{
-    ActiveTheme, Badge, Button, Card, FieldShell, Progress, Separator, Skeleton, StyledExt, Switch,
-    Tabs, Theme, ThemeMode,
+    ActiveTheme, Badge, Button, Card, Checkbox, Dialog, FieldShell, Icon, IconName, Menu, MenuItem,
+    Popover, Progress, Radio, RadioGroup, Separator, Skeleton, StyledExt, Switch, Tabs, TextInput,
+    Theme, ThemeMode, Tooltip,
 };
 use gpui::{
-    AppContext as _, Context, ElementId, InteractiveElement as _, IntoElement, ParentElement as _,
-    Render, StatefulInteractiveElement as _, Styled as _, Window, WindowOptions, div, px,
+    AppContext as _, Context, ElementId, Entity, InteractiveElement as _, IntoElement,
+    ParentElement as _, Render, StatefulInteractiveElement as _, Styled as _, Window,
+    WindowOptions, div, px,
 };
 
 struct Gallery {
+    // V1 state
     dark: bool,
     counter: usize,
     switch_enabled: bool,
     progress: f32,
     selected_tab: usize,
+    // V2 state
+    text_input_entity: Entity<TextInput>,
+    checkbox_checked: bool,
+    radio_selected: &'static str,
+    dialog_open: bool,
+    popover_open: bool,
+    menu_open: bool,
+    menu_selected: Option<usize>,
+    #[allow(dead_code)]
+    v2_section: &'static str,
 }
 
 impl Gallery {
-    fn new() -> Self {
+    fn new(cx: &mut Context<Self>) -> Self {
+        let text_input_entity =
+            cx.new(|cx| TextInput::new("text-input-demo", cx).placeholder("Type something..."));
         Self {
             dark: false,
             counter: 0,
             switch_enabled: true,
             progress: 64.,
             selected_tab: 0,
+            text_input_entity,
+            checkbox_checked: true,
+            radio_selected: "option-a",
+            dialog_open: false,
+            popover_open: false,
+            menu_open: false,
+            menu_selected: None,
+            v2_section: "Inputs",
         }
     }
 
@@ -73,14 +96,19 @@ impl Render for Gallery {
                 div()
                     .text_size(px(11.))
                     .text_color(c.muted_foreground)
-                    .child("GPUI component starter"),
+                    .child("GPUI component kit"),
             )
             .child(Separator::new())
-            .child(Badge::new("V1 Foundation").primary())
+            .child(Badge::new("V2 Components").primary())
             .child(div().h(px(8.)))
             .children(
                 [
-                    "Overview", "Buttons", "Inputs", "Status", "Layout", "Roadmap",
+                    "Overview",
+                    "Buttons",
+                    "Inputs",
+                    "Selection",
+                    "Overlays",
+                    "Icons",
                 ]
                 .into_iter()
                 .enumerate()
@@ -125,7 +153,7 @@ impl Render for Gallery {
                         div()
                             .text_size(px(11.))
                             .text_color(c.muted_foreground)
-                            .child("Clean-room Rust + GPUI starter"),
+                            .child("V2 — Editable inputs, overlays, menus, icons"),
                     ),
             )
             .child(
@@ -151,6 +179,8 @@ impl Render for Gallery {
                         cx.notify();
                     })),
             );
+
+        // ── V1 Foundation cards ──
 
         let buttons_card =
             Card::new()
@@ -271,7 +301,7 @@ impl Render for Gallery {
 
         let fields_card = Card::new()
             .title("Fields and status")
-            .description("V1 FieldShell is visual-only; editable input is scheduled for V2")
+            .description("V1 FieldShell (visual-only) and V2 TextInput (editable)")
             .child(
                 div()
                     .grid()
@@ -289,6 +319,20 @@ impl Render for Gallery {
                             .error(true),
                     ),
             )
+            .child(Separator::new())
+            .child(
+                div()
+                    .v_flex()
+                    .gap_2()
+                    .child(
+                        div()
+                            .text_color(c.foreground)
+                            .text_size(px(13.))
+                            .child("TextInput (V2):"),
+                    )
+                    .child(self.text_input_entity.clone()),
+            )
+            .child(Separator::new())
             .child(
                 div()
                     .flex()
@@ -347,6 +391,385 @@ impl Render for Gallery {
                     .child(Skeleton::new(px(180.), px(12.))),
             );
 
+        // ── V2 Selection card ──
+
+        let selection_card = Card::new()
+            .title("Selection controls (V2)")
+            .description("Checkbox, Switch, Radio — caller-managed state")
+            .child(
+                div()
+                    .v_flex()
+                    .gap_3()
+                    .child(
+                        div()
+                            .flex()
+                            .items_center()
+                            .justify_between()
+                            .child(
+                                div()
+                                    .v_flex()
+                                    .gap_1()
+                                    .child(
+                                        div()
+                                            .text_color(c.foreground)
+                                            .text_size(px(13.))
+                                            .child("Enable feature"),
+                                    )
+                                    .child(
+                                        div()
+                                            .text_color(c.muted_foreground)
+                                            .text_size(px(11.))
+                                            .child(if self.checkbox_checked {
+                                                "Feature enabled"
+                                            } else {
+                                                "Feature disabled"
+                                            }),
+                                    ),
+                            )
+                            .child(
+                                Checkbox::new("feature-checkbox", self.checkbox_checked)
+                                    .label("Enable")
+                                    .on_click(cx.listener(|this, _, _, cx| {
+                                        this.checkbox_checked = !this.checkbox_checked;
+                                        cx.notify();
+                                    })),
+                            ),
+                    )
+                    .child(Separator::new())
+                    .child(
+                        div()
+                            .v_flex()
+                            .gap_1()
+                            .child(
+                                div()
+                                    .text_color(c.foreground)
+                                    .text_size(px(13.))
+                                    .child("Radio group"),
+                            )
+                            .child(
+                                div()
+                                    .text_color(c.muted_foreground)
+                                    .text_size(px(11.))
+                                    .child(format!("Selected: {}", self.radio_selected)),
+                            )
+                            .child(
+                                RadioGroup::new()
+                                    .child(
+                                        Radio::new("radio-a", "option-a")
+                                            .label("Option A")
+                                            .selected(self.radio_selected == "option-a")
+                                            .on_click(cx.listener(|this, _, _, cx| {
+                                                this.radio_selected = "option-a";
+                                                cx.notify();
+                                            })),
+                                    )
+                                    .child(
+                                        Radio::new("radio-b", "option-b")
+                                            .label("Option B")
+                                            .selected(self.radio_selected == "option-b")
+                                            .on_click(cx.listener(|this, _, _, cx| {
+                                                this.radio_selected = "option-b";
+                                                cx.notify();
+                                            })),
+                                    )
+                                    .child(
+                                        Radio::new("radio-c", "option-c")
+                                            .label("Option C (disabled)")
+                                            .disabled(true)
+                                            .selected(self.radio_selected == "option-c")
+                                            .on_click(cx.listener(|this, _, _, cx| {
+                                                this.radio_selected = "option-c";
+                                                cx.notify();
+                                            })),
+                                    ),
+                            ),
+                    ),
+            );
+
+        // ── V2 Overlays card ──
+
+        let overlays_card = Card::new()
+            .title("Overlays (V2)")
+            .description("Dialog, Popover, Menu — stateless views controlled by the Gallery")
+            .child(
+                div()
+                    .v_flex()
+                    .gap_3()
+                    .child(
+                        div()
+                            .flex()
+                            .items_center()
+                            .gap_2()
+                            .child(
+                                Button::new("open-dialog")
+                                    .primary()
+                                    .small()
+                                    .label(if self.dialog_open {
+                                        "Close Dialog"
+                                    } else {
+                                        "Open Dialog"
+                                    })
+                                    .on_click(cx.listener(|this, _, _, cx| {
+                                        this.dialog_open = !this.dialog_open;
+                                        cx.notify();
+                                    })),
+                            )
+                            .child(
+                                div()
+                                    .text_color(c.muted_foreground)
+                                    .text_size(px(11.))
+                                    .child(if self.dialog_open {
+                                        "Dialog is open"
+                                    } else {
+                                        "Dialog is closed"
+                                    }),
+                            ),
+                    )
+                    .child(
+                        Dialog::new()
+                            .title("V2 Dialog")
+                            .open(self.dialog_open)
+                            .on_close(cx.listener(|this, _, _, cx| {
+                                this.dialog_open = false;
+                                cx.notify();
+                            }))
+                            .child(
+                                div()
+                                    .v_flex()
+                                    .gap_3()
+                                    .p_4()
+                                    .child(
+                                        div()
+                                            .text_color(c.foreground)
+                                            .text_size(px(13.))
+                                            .child("This is a modal dialog overlay."),
+                                    )
+                                    .child(
+                                        div()
+                                            .text_color(c.muted_foreground)
+                                            .text_size(px(11.))
+                                            .child("Click the close button or the backdrop to dismiss."),
+                                    )
+                                    .child(
+                                        Button::new("dialog-close-btn")
+                                            .primary()
+                                            .label("OK")
+                                            .on_click(cx.listener(|this, _, _, cx| {
+                                                this.dialog_open = false;
+                                                cx.notify();
+                                            })),
+                                    ),
+                            ),
+                    )
+                    .child(Separator::new())
+                    .child(
+                        div()
+                            .v_flex()
+                            .gap_2()
+                            .child(
+                                div()
+                                    .text_color(c.foreground)
+                                    .text_size(px(13.))
+                                    .child("Popover demo"),
+                            )
+                            .child(
+                                div()
+                                    .flex()
+                                    .items_center()
+                                    .gap_2()
+                                    .child(
+                                        Button::new("toggle-popover")
+                                            .small()
+                                            .secondary()
+                                            .label("Toggle Popover")
+                                            .on_click(cx.listener(|this, _, _, cx| {
+                                                this.popover_open = !this.popover_open;
+                                                cx.notify();
+                                            })),
+                                    )
+                                    .child(Popover::new("demo-popover").open(self.popover_open).child(
+                                        div()
+                                            .p_4()
+                                            .v_flex()
+                                            .gap_2()
+                                            .child(
+                                                div()
+                                                    .text_color(c.foreground)
+                                                    .text_size(px(13.))
+                                                    .child("Popover content"),
+                                            )
+                                            .child(
+                                                div()
+                                                    .text_color(c.muted_foreground)
+                                                    .text_size(px(11.))
+                                                    .child("Inline popover with themed styling."),
+                                            ),
+                                    )),
+                            ),
+                    )
+                    .child(Separator::new())
+                    .child(
+                        div()
+                            .v_flex()
+                            .gap_2()
+                            .child(
+                                div()
+                                    .text_color(c.foreground)
+                                    .text_size(px(13.))
+                                    .child("Menu demo"),
+                            )
+                            .child(
+                                div()
+                                    .flex()
+                                    .items_center()
+                                    .gap_2()
+                                    .child(
+                                        Button::new("toggle-menu")
+                                            .small()
+                                            .secondary()
+                                            .label(if self.menu_open {
+                                                "Close Menu"
+                                            } else {
+                                                "Open Menu"
+                                            })
+                                            .on_click(cx.listener(|this, _, _, cx| {
+                                                this.menu_open = !this.menu_open;
+                                                cx.notify();
+                                            })),
+                                    )
+                                    .child(
+                                        div()
+                                            .text_color(c.muted_foreground)
+                                            .text_size(px(11.))
+                                            .child(match self.menu_selected {
+                                                Some(i) => format!("Selected: item {}", i),
+                                                None => "Nothing selected".into(),
+                                            }),
+                                    ),
+                            )
+                            .child(
+                                Menu::new("demo-menu")
+                                    .open(self.menu_open)
+                                    .items(vec![
+                                        MenuItem::new("Save").icon("💾"),
+                                        MenuItem::new("Edit").icon("✏️"),
+                                        MenuItem::new("Delete").disabled(true).icon("🗑️"),
+                                    ])
+                                    .on_select({
+                                        let handle = cx.entity().downgrade();
+                                        move |index, _event, _window, cx| {
+                                            if let Some(handle) = handle.upgrade() {
+                                                handle.update(cx, |this, cx| {
+                                                    this.menu_selected = Some(index);
+                                                    this.menu_open = false;
+                                                    cx.notify();
+                                                });
+                                            }
+                                        }
+                                    }),
+                            ),
+                    )
+                    .child(Separator::new())
+                    .child(
+                        div()
+                            .v_flex()
+                            .gap_1()
+                            .child(
+                                div()
+                                    .text_color(c.foreground)
+                                    .text_size(px(13.))
+                                    .child("Tooltip demo"),
+                            )
+                            .child(
+                                Tooltip::new("V2 inline caption tooltip")
+                                    .child(
+                                        Badge::new("Hover me").primary(),
+                                    ),
+                            ),
+                    ),
+            );
+
+        // ── V2 Icons card ──
+
+        let icons_card = Card::new()
+            .title("Icons (V2)")
+            .description("Text-character icons — no SVG dependency")
+            .child(
+                div()
+                    .flex()
+                    .flex_wrap()
+                    .gap_3()
+                    .child(icon_demo("Check", IconName::Check, c))
+                    .child(icon_demo("Close", IconName::Close, c))
+                    .child(icon_demo("Menu", IconName::Menu, c))
+                    .child(icon_demo("ChevronDown", IconName::ChevronDown, c))
+                    .child(icon_demo("ChevronRight", IconName::ChevronRight, c))
+                    .child(icon_demo("Info", IconName::Info, c))
+                    .child(icon_demo("Warning", IconName::Warning, c))
+                    .child(icon_demo("Error", IconName::Error, c))
+                    .child(icon_demo("Success", IconName::Success, c)),
+            );
+
+        // ── V2 Notification toast ──
+
+        let notification_card = Card::new()
+            .title("Notifications (V2)")
+            .description("Toast-style notifications with auto-dismiss")
+            .child(
+                div()
+                    .v_flex()
+                    .gap_2()
+                    .child(
+                        div()
+                            .flex()
+                            .flex_wrap()
+                            .gap_2()
+                            .child(
+                                Button::new("notify-info")
+                                    .extra_small()
+                                    .label("Info")
+                                    .on_click(cx.listener(|_this, _, _, cx| {
+                                        cx.notify();
+                                    })),
+                            )
+                            .child(
+                                Button::new("notify-success")
+                                    .extra_small()
+                                    .primary()
+                                    .label("Success")
+                                    .on_click(cx.listener(|_this, _, _, cx| {
+                                        cx.notify();
+                                    })),
+                            )
+                            .child(
+                                Button::new("notify-warning")
+                                    .extra_small()
+                                    .secondary()
+                                    .label("Warning")
+                                    .on_click(cx.listener(|_this, _, _, cx| {
+                                        cx.notify();
+                                    })),
+                            )
+                            .child(
+                                Button::new("notify-error")
+                                    .extra_small()
+                                    .danger()
+                                    .label("Error")
+                                    .on_click(cx.listener(|_this, _, _, cx| {
+                                        cx.notify();
+                                    })),
+                            ),
+                    )
+                    .child(
+                        div()
+                            .text_color(c.muted_foreground)
+                            .text_size(px(11.))
+                            .child(
+                                "Notifications require Entity integration — see V2 docs for setup.",
+                            ),
+                    ),
+            );
+
         let content = div()
             .id(ElementId::Name("content".into()))
             .w_full()
@@ -357,8 +780,8 @@ impl Render for Gallery {
             .p_6()
             .bg(c.background)
             .child(Self::section_title(
-                "Foundation components",
-                "A deliberately small V1 that can be extended safely into a complete desktop UI kit.",
+                "Acme UI Kit — V2",
+                "Editable TextInput, Checkbox, Radio, Dialog, Popover, Menu, Icons, Notifications, and Tooltip.",
                 cx,
             ))
             .child(
@@ -366,10 +789,18 @@ impl Render for Gallery {
                     .grid()
                     .grid_cols(2)
                     .gap_4()
+                    // V1 row
                     .child(buttons_card)
                     .child(controls_card)
+                    // V1+V2 row
                     .child(fields_card)
-                    .child(tabs_card),
+                    .child(tabs_card)
+                    // V2 row
+                    .child(selection_card)
+                    .child(overlays_card)
+                    // V2 row
+                    .child(icons_card)
+                    .child(notification_card),
             );
 
         div()
@@ -389,13 +820,32 @@ impl Render for Gallery {
     }
 }
 
+fn icon_demo(
+    label: &'static str,
+    name: IconName,
+    c: acme_ui::ThemeColors,
+) -> impl gpui::IntoElement {
+    use gpui::Styled as _;
+    div()
+        .v_flex()
+        .items_center()
+        .gap_1()
+        .child(Icon::new(name).with_size(px(18.)))
+        .child(
+            div()
+                .text_size(px(9.))
+                .text_color(c.muted_foreground)
+                .child(label),
+        )
+}
+
 fn main() {
     gpui_platform::application().run(move |cx| {
         acme_ui::init(cx);
 
         cx.spawn(async move |cx| {
             if let Err(error) =
-                cx.open_window(WindowOptions::default(), |_, cx| cx.new(|_| Gallery::new()))
+                cx.open_window(WindowOptions::default(), |_, cx| cx.new(Gallery::new))
             {
                 eprintln!("failed to open Acme Gallery window: {error:?}");
             }
