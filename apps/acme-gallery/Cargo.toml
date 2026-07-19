@@ -1,0 +1,16 @@
+[package]
+name = "acme-gallery"
+description = "Interactive component gallery for Acme UI"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+acme-ui.workspace = true
+gpui.workspace = true
+gpui_platform.workspace = true
+
+[lints]
+workspace = true
