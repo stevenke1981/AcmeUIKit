@@ -28,6 +28,16 @@ pub enum IconName {
     Error,
     /// Success checkmark.
     Success,
+    /// Search / magnifying glass.
+    Search,
+    /// Plus / add.
+    Plus,
+    /// Minus / subtract.
+    Minus,
+    /// Settings / gear.
+    Settings,
+    /// User / person.
+    User,
 }
 
 impl IconName {
@@ -43,6 +53,11 @@ impl IconName {
             Self::Warning => "⚠",
             Self::Error => "✗",
             Self::Success => "✔",
+            Self::Search => "🔍",
+            Self::Plus => "+",
+            Self::Minus => "−",
+            Self::Settings => "⚙",
+            Self::User => "👤",
         }
     }
 }

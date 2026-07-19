@@ -1,11 +1,13 @@
 use acme_ui::{
-    ActiveTheme, Alert, Avatar, Badge, BarChart, BarEntry, Breadcrumb, Button, Card, Checkbox,
-    Combobox, ComboboxOption, Dialog, Direction, Dock, DockArea, DockPanel, Field, FieldShell,
-    Form, Icon, IconName, Kbd, List, ListItem, Markdown, Menu, MenuItem, Pagination, Popover,
-    Progress, Radio, RadioGroup, Resizable, Select, SelectOption, Separator, SettingsGroup,
-    SettingsPage, SettingsRow, Sidebar, Size, Skeleton, Slider, SortDirection, Stepper, StyledExt,
-    Switch, Table, TableColumn, Tabs, Tag, TextInput, Textarea, Theme, ThemeMode, Tile,
-    TileDirection, Tiles, Tone, Toolbar, Tooltip, Tree, TreeNode, hsl, validators,
+    Accordion, ActiveTheme, Alert, Avatar, Badge, BarChart, BarEntry, Breadcrumb, Button, Calendar,
+    Card, Checkbox, Collapsible, ColorPicker, Combobox, ComboboxOption, CommandPalette, DatePicker,
+    Dialog, Direction, Dock, DockArea, DockPanel, Drawer, EmptyState, Field, FieldShell, Form,
+    Grid, Icon, IconButton, IconName, Kbd, Label, List, ListItem, Markdown,     Menu, MenuItem, NumberInput, Pagination, Popover, Progress, PropertyGrid,
+    Radio, RadioGroup, Resizable, ScrollArea, SearchInput, SegmentedControl, Select, SelectOption,
+    Separator, SettingsGroup, SettingsPage, SettingsRow, Sidebar, Size, Skeleton, Slider,
+    SortDirection, Spinner, Stack, StatusBar, Stepper, StyledExt, Switch, Table, TableColumn, Tabs,
+    Tag, TextInput, Textarea, Theme, ThemeMode, Tile, TileDirection, Tiles, ToggleButton, Tone,
+    Toolbar, Tooltip, Tree, TreeNode, hsl, validators,
 };
 use gpui::{
     AppContext as _, Context, ElementId, Entity, InteractiveElement as _, IntoElement,
@@ -1125,6 +1127,74 @@ impl Render for Gallery {
                     .child(Kbd::new("Ctrl+S"))
             );
 
+        // ── V6 More Components card ──
+
+        let v6_card = Card::new()
+            .title("V6 More Components")
+            .description("Label, ScrollArea, Stack, Grid, IconButton, ToggleButton, SegmentedControl, Spinner, Collapsible, Accordion, Drawer, CommandPalette, EmptyState, StatusBar, NumberInput, SearchInput, DatePicker, Calendar, ColorPicker, PropertyGrid")
+            // Label
+            .child(Separator::new())
+            .child(div().child("Label (V6):"))
+            .child(Label::new("Username").size(Size::Small))
+            .child(Label::new("Full Name"))
+            .child(Label::new("Section Heading").size(Size::Large))
+            // Stack + Grid
+            .child(Separator::new())
+            .child(div().child("Stack + Grid (V6):"))
+            .child(Stack::horizontal().gap(px(4.)).child(Button::new("s1").extra_small().label("A")).child(Button::new("s2").extra_small().label("B")).spacer().child(Button::new("s3").extra_small().label("C")))
+            .child(Grid::new().cols(3).gap(px(4.)).child(Badge::new("A")).child(Badge::new("B")).child(Badge::new("C")).child(Badge::new("D")).child(Badge::new("E")))
+            // ScrollArea
+            .child(Separator::new())
+            .child(div().child("ScrollArea (V6):"))
+            .child(ScrollArea::new("demo-scroll").child(div().h(px(60.)).child("Scrollable content with overflow hidden")))
+            // IconButton
+            .child(Separator::new())
+            .child(div().child("IconButton (V6):"))
+            .child(div().h_flex().gap_2().child(IconButton::new("ib-search", IconName::Search)).child(IconButton::new("ib-settings", IconName::Settings)))
+            // ToggleButton + SegmentedControl
+            .child(Separator::new())
+            .child(div().child("ToggleButton + SegmentedControl (V6):"))
+            .child(div().h_flex().gap_2().child(ToggleButton::new("tb-dark", "Dark").selected(false)).child(ToggleButton::new("tb-light", "Light").selected(true)))
+            .child(SegmentedControl::new("view-mode").items(&["List", "Grid", "Split"]).selected(1))
+            // Spinner
+            .child(Separator::new())
+            .child(div().child("Spinner (V6):"))
+            .child(div().h_flex().gap_3().child(Spinner::new().size(Size::Small)).child(Spinner::new()).child(Spinner::new().size(Size::Large)))
+            // Collapsible + Accordion
+            .child(Separator::new())
+            .child(div().child("Collapsible + Accordion (V6):"))
+            .child(Collapsible::new("Details").open(true).child(div().child("Hidden content here")))
+            .child(Accordion::new().section("Section 1", true, div().child("Content 1")).section("Section 2", false, div().child("Content 2")))
+            // Drawer
+            .child(Separator::new())
+            .child(div().child("Drawer + CommandPalette (V6) — need Entity: show placeholder:"))
+            .child(div().h_flex().gap_2().child(Drawer::new("Settings").open(true).child(div().child("Drawer content"))).child(CommandPalette::new().open(true)))
+            // EmptyState
+            .child(Separator::new())
+            .child(div().child("EmptyState (V6):"))
+            .child(EmptyState::new("No items found").icon(IconName::Search).description("Try adjusting your filters"))
+            // StatusBar
+            .child(Separator::new())
+            .child(div().child("StatusBar (V6):"))
+            .child(StatusBar::new().left("Ready").right("Line 42, Col 8"))
+            // NumberInput + SearchInput
+            .child(Separator::new())
+            .child(div().child("NumberInput + SearchInput (V6):"))
+            .child(div().h_flex().gap_3().child(NumberInput::new("demo-num").value(5).min(0).max(10)).child(SearchInput::new("demo-search").placeholder("Search…")))
+            // DatePicker + Calendar
+            .child(Separator::new())
+            .child(div().child("DatePicker + Calendar (V6):"))
+            .child(DatePicker::new("2024-12-25"))
+            .child(Calendar::new("December 2024"))
+            // ColorPicker
+            .child(Separator::new())
+            .child(div().child("ColorPicker (V6):"))
+            .child(ColorPicker::new("Primary", hsl(217., 0.91, 0.59)))
+            // PropertyGrid
+            .child(Separator::new())
+            .child(div().child("PropertyGrid (V6):"))
+            .child(PropertyGrid::new().property("Name", "Acme App").property("Version", "2.1.0").property("Author", "Acme Corp"));
+
         // ── V2 Icons card ──
 
         let icons_card = Card::new()
@@ -1242,6 +1312,8 @@ impl Render for Gallery {
                     .child(v4_card)
                     // V5 row
                     .child(v5_card)
+                    // V6 row
+                    .child(v6_card)
                     // V2 row
                     .child(icons_card)
                     .child(notification_card),
