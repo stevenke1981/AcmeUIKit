@@ -1,2 +1,5 @@
 [build]
 incremental = true
+
+[target.'cfg(windows)']
+rustflags = ["-C", "link-args=/STACK:8388608"]

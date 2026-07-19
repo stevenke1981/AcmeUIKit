@@ -28,6 +28,8 @@ use gpui::{
     WindowOptions, div, px,
 };
 
+mod examples;
+
 struct Gallery {
     // V1 state
     dark: bool,
@@ -63,6 +65,10 @@ struct Gallery {
     states_disabled: bool,
     focus_trap_active: bool,
     modal_backdrop_open: bool,
+    // Real-world examples
+    settings_center: Entity<examples::settings_center::SettingsCenter>,
+    file_manager: Entity<examples::file_manager::FileManager>,
+    desktop_editor: Entity<examples::desktop_editor::DesktopEditor>,
 }
 
 impl Gallery {
@@ -143,6 +149,9 @@ impl Gallery {
                 ])
                 .show_filter_row(true)
         });
+        let settings_center = cx.new(|_cx| examples::settings_center::SettingsCenter::new());
+        let file_manager = cx.new(examples::file_manager::FileManager::new);
+        let desktop_editor = cx.new(|_cx| examples::desktop_editor::DesktopEditor::new());
         Self {
             dark: false,
             counter: 0,
@@ -172,6 +181,9 @@ impl Gallery {
             tree_selected: None,
             table_sort_key: None,
             table_sort_dir: SortDirection::None,
+            settings_center,
+            file_manager,
+            desktop_editor,
         }
     }
 
@@ -2190,7 +2202,52 @@ impl Render for Gallery {
                     .child(p2_charts_card)
                     // V2 row
                     .child(icons_card)
-                    .child(notification_card),
+                    .child(notification_card)
+                    // ── Real-world Example: Settings Center ──
+                    .child(
+                        div().child(
+                            Card::new()
+                                .title("Settings Center")
+                                .description(
+                                    "Real-world example: Sidebar navigation + SettingsPage groups + Switch toggles + Dialog confirmation",
+                                )
+                                .child(
+                                    div()
+                                        .h(px(480.))
+                                        .child(self.settings_center.clone()),
+                                ),
+                        ),
+                    )
+                    // ── Real-world Example: File Manager ──
+                    .child(
+                        div().child(
+                            Card::new()
+                                .title("File / Asset Manager")
+                                .description(
+                                    "Real-world example: Tree folder navigation + DataGrid file listing + ThumbnailStrip preview + ContextMenu + DropZone",
+                                )
+                                .child(
+                                    div()
+                                        .h(px(520.))
+                                        .child(self.file_manager.clone()),
+                                ),
+                        ),
+                    )
+                    // ── Real-world Example: Desktop Editor ──
+                    .child(
+                        div().child(
+                            Card::new()
+                                .title("Desktop Editor")
+                                .description(
+                                    "Real-world example: TitleBar + AppMenuBar + Dock w/ panels + Canvas + PropertyGrid + StatusBar + CommandPalette",
+                                )
+                                .child(
+                                    div()
+                                        .h(px(560.))
+                                        .child(self.desktop_editor.clone()),
+                                ),
+                        ),
+                    ),
             );
 
         div()
