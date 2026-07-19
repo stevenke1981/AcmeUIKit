@@ -1,13 +1,14 @@
 use acme_ui::{
     Accordion, ActiveTheme, Alert, Avatar, Badge, BarChart, BarEntry, Breadcrumb, Button, Calendar,
     Card, Checkbox, Collapsible, ColorPicker, Combobox, ComboboxOption, CommandPalette, DatePicker,
-    Dialog, Direction, Dock, DockArea, DockPanel, Drawer, EmptyState, Field, FieldShell, Form,
-    Grid, Icon, IconButton, IconName, Kbd, Label, List, ListItem, Markdown,     Menu, MenuItem, NumberInput, Pagination, Popover, Progress, PropertyGrid,
-    Radio, RadioGroup, Resizable, ScrollArea, SearchInput, SegmentedControl, Select, SelectOption,
-    Separator, SettingsGroup, SettingsPage, SettingsRow, Sidebar, Size, Skeleton, Slider,
-    SortDirection, Spinner, Stack, StatusBar, Stepper, StyledExt, Switch, Table, TableColumn, Tabs,
-    Tag, TextInput, Textarea, Theme, ThemeMode, Tile, TileDirection, Tiles, ToggleButton, Tone,
-    Toolbar, Tooltip, Tree, TreeNode, hsl, validators,
+    Dialog, Direction, Dock, DockArea, DockPanel, Drawer, EmptyState, ErrorState, Field,
+    FieldShell, Form, Grid, Icon, IconButton, IconName, Kbd, Label, List, ListItem, Markdown, Menu,
+    MenuItem, NumberInput, Pagination, Popover, Progress, PropertyGrid, Radio, RadioGroup,
+    Resizable, ScrollArea, SearchInput, SegmentedControl, Select, SelectOption, Separator,
+    SettingsGroup, SettingsPage, SettingsRow, Sidebar, Size, Skeleton, Slider, SortDirection,
+    Spinner, Stack, StatusBar, Stepper, StyledExt, Switch, Table, TableColumn, Tabs, Tag,
+    TextInput, Textarea, Theme, ThemeMode, Tile, TileDirection, Tiles, ToggleButton, Tone, Toolbar,
+    Tooltip, Tree, TreeNode, hsl, validators,
 };
 use gpui::{
     AppContext as _, Context, ElementId, Entity, InteractiveElement as _, IntoElement,
@@ -1131,7 +1132,7 @@ impl Render for Gallery {
 
         let v6_card = Card::new()
             .title("V6 More Components")
-            .description("Label, ScrollArea, Stack, Grid, IconButton, ToggleButton, SegmentedControl, Spinner, Collapsible, Accordion, Drawer, CommandPalette, EmptyState, StatusBar, NumberInput, SearchInput, DatePicker, Calendar, ColorPicker, PropertyGrid")
+            .description("Label, ScrollArea, Stack, Grid, IconButton, ToggleButton, SegmentedControl, Spinner, Collapsible, Accordion, Drawer, CommandPalette, EmptyState, ErrorState, StatusBar, NumberInput, SearchInput, DatePicker, Calendar, ColorPicker, PropertyGrid")
             // Label
             .child(Separator::new())
             .child(div().child("Label (V6):"))
@@ -1173,6 +1174,10 @@ impl Render for Gallery {
             .child(Separator::new())
             .child(div().child("EmptyState (V6):"))
             .child(EmptyState::new("No items found").icon(IconName::Search).description("Try adjusting your filters"))
+            // ErrorState
+            .child(Separator::new())
+            .child(div().child("ErrorState (V6):"))
+            .child(ErrorState::new("Connection lost").message("Check your network and try again").retry("Retry"))
             // StatusBar
             .child(Separator::new())
             .child(div().child("StatusBar (V6):"))
