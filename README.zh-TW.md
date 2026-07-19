@@ -2,16 +2,24 @@
 
 一套以 **GPUI**（Zed 原生 UI 框架）重新設計的 Rust 桌面 GUI 元件庫。程式碼為全新撰寫，不直接複製原專案實作。
 
-## 目前進度 — V1+V2+V3+V4
+## 目前進度 — V1–V10 + P2 圖表 + P2 基礎設施
 
 | 階段 | 元件 | 狀態 |
 |------|------|------|
 | **V1 基礎** | Button、Card、Badge、Progress、Switch、FieldShell、Tabs、Separator、Skeleton、Theme（Light/Dark）、primitives | ✅ |
 | **V2 控制項** | TextInput、Textarea、Checkbox、Radio/RadioGroup、Select、Combobox、Menu、Dialog、Popover、Tooltip、Notification、IconProvider | ✅ |
-| **V3 資料與佈局** | Pagination（+10 測試）、Sidebar、Resizable、LoadingState、VirtualList、**Tree**、**Form+Validation**、**Table（可排序）** | ✅ |
-| **V4 豐富內容** | **SettingsPage**、**Tiles**、**Markdown**、**BarChart**、**Dock** | ✅ |
+| **V3 資料與佈局** | Pagination（+10 測試）、Sidebar、Resizable、LoadingState、VirtualList、Tree、Form+Validation、Table（可排序） | ✅ |
+| **V4 豐富內容** | SettingsPage、Tiles、Markdown、BarChart、Dock | ✅ |
+| **V5 工具元件** | Alert、Tag、Slider、Avatar、Breadcrumb、Stepper、Toolbar、List、Kbd | ✅ |
+| **V6 更多元件** | Label、ScrollArea、Stack、Grid、IconButton、ToggleButton、SegmentedControl、Spinner、Collapsible、Accordion、Drawer、CommandPalette、EmptyState、ErrorState、StatusBar、NumberInput、SearchInput、DatePicker、Calendar、ColorPicker、PropertyGrid | ✅ |
+| **V7 P1 輸入與選擇** | PasswordInput、MaskedInput、PinInput、TimePicker、DateRangePicker、FilePicker、MultiSelect、RangeSlider、Rating、FormMessage、Autocomplete | ✅ |
+| **V8 桌面殼層** | TitleBar、WindowControls、AppMenuBar、NavigationRail、NavigationView、SplitView、InspectorPanel、ContextToolbar、ShortcutManager、SystemTray、FocusRing、FocusScope、DragRegion、DropZone、ResizeHandle、WindowOverlay、AboutDialog | ✅ |
+| **V9 DataGrid** | DataGrid（Entity 架構，支援排序/篩選/編輯/鍵盤導航/CSV 匯出） | ✅ |
+| **V10 內容與媒體** | RichText、HtmlView、LineNumbers、DiffViewer、MarkdownPreview、DocumentOutline、FindReplace、LogViewer、HexViewer、ImageView、AvatarGroup、Carousel、Lightbox、Canvas、ZoomView、PanView、ThumbnailStrip、Cropper、AnnotationLayer | ✅ |
+| **P2 圖表** | PieChart、DonutChart、Gauge、Sparkline、LineChart、AreaChart、ScatterChart、Histogram、Heatmap、CandlestickChart、StreamingChart + 共用 chart_base（Scale、Axis、Legend、ChartColors） | ✅ |
+| **P2 基礎設施** | Component States（載入/停用遮罩、驗證邊框）、Accessibility（40+ ARIA 角色、17 個屬性）、Focus（FocusTrap、RovingTabIndex、鍵盤處理器）、Overlay Manager（ModalBackdrop、AutoPositioner、ClickOutsideListener、FocusRestore） | ✅ |
 
-**總計**：28 個元件，約 8000+ 行程式碼，零警告編譯。
+**總計**：132 個原始檔，約 16500+ 行程式碼，零警告編譯。
 
 ## 快速開始
 
@@ -25,18 +33,23 @@
 cargo run -p acme-gallery
 ```
 
-Gallery 功能：切換 Light/Dark 主題、所有元件的互動示範。
+Gallery 功能：約 100 個元件展示、切換 Light/Dark 主題、所有元件的互動示範。
 
 ## 專案結構
 
 ```
 acme-ui-kit/
 ├── apps/acme-gallery/       # 互動式元件展示
-├── crates/acme-ui/src/      # 32 個原始檔
+├── crates/acme-ui/src/      # 132 個原始檔
 │   ├── lib.rs               # 模組宣告 + re-export
 │   ├── theme.rs             # Theme、FontSizes、Spacing、ThemeColors
 │   ├── styled.rs            # StyledExt 輔助函式（h_flex、v_flex）
 │   ├── primitives.rs        # Size / Tone 列舉
+│   ├── chart_base.rs        # 共用圖表基礎設施（Scale、Axis、Legend）
+│   ├── states.rs            # 載入/停用遮罩、驗證、StateStyling trait
+│   ├── accessibility.rs     # ARIA 角色/屬性、減少動畫、高對比度
+│   ├── focus.rs             # FocusTrap、RovingTabIndex、鍵盤處理器
+│   ├── overlay_manager.rs   # ModalBackdrop、AutoPositioner、ClickOutsideListener
 │   ├── icons.rs             # IconProvider、IconName
 │   └── *.rs                 # 每元件一個檔案
 ├── docs/                    # 架構、設計系統、API、路線圖
