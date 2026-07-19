@@ -126,7 +126,7 @@ impl RenderOnce for Radio {
                     } else {
                         c.foreground
                     })
-                    .text_size(px(13.))
+                    .text_size(cx.theme().font_sizes.body)
                     .child(label),
             );
         }

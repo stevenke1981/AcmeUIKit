@@ -90,7 +90,7 @@ impl RenderOnce for Checkbox {
             } else {
                 c.muted_foreground
             })
-            .text_size(px(12.))
+            .text_size(cx.theme().font_sizes.caption)
             .when(!disabled, |this| {
                 this.cursor_pointer().hover(|style| style.bg(c.muted))
             })
@@ -112,7 +112,7 @@ impl RenderOnce for Checkbox {
                     } else {
                         c.foreground
                     })
-                    .text_size(px(13.))
+                    .text_size(cx.theme().font_sizes.body)
                     .child(label),
             );
         }

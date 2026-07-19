@@ -123,7 +123,7 @@ impl RenderOnce for Dialog {
                     div()
                         .flex_1()
                         .text_color(c.foreground)
-                        .text_size(px(16.))
+                        .text_size(theme.font_sizes.heading)
                         .child(title.clone()),
                 );
             }
@@ -143,7 +143,7 @@ impl RenderOnce for Dialog {
                         .child(
                             div()
                                 .text_color(c.muted_foreground)
-                                .text_size(px(18.))
+                                .text_size(theme.font_sizes.heading)
                                 .child("×"),
                         )
                         .on_click(move |event, window, cx| handler(event, window, cx)),

@@ -1,6 +1,5 @@
 use gpui::{
-    AnyElement, App, IntoElement, ParentElement, RenderOnce, SharedString, Styled as _, Window,
-    div, px,
+    AnyElement, App, IntoElement, ParentElement, RenderOnce, SharedString, Styled as _, Window, div,
 };
 
 use crate::{ActiveTheme, StyledExt};
@@ -44,7 +43,7 @@ impl RenderOnce for Tooltip {
 
         div().v_flex().gap_1().children(self.children).child(
             div()
-                .text_size(px(11.))
+                .text_size(cx.theme().font_sizes.caption)
                 .text_color(c.muted_foreground)
                 .child(self.content),
         )

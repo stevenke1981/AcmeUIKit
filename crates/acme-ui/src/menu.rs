@@ -148,7 +148,7 @@ impl RenderOnce for Menu {
                     .flex()
                     .items_center()
                     .gap_2()
-                    .text_size(px(13.))
+                    .text_size(cx.theme().font_sizes.body)
                     .text_color(if disabled {
                         c.muted_foreground
                     } else if selected {

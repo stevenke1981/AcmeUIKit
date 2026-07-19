@@ -1,6 +1,5 @@
 use gpui::{
-    AnyElement, App, IntoElement, ParentElement, RenderOnce, SharedString, Styled as _, Window,
-    div, px,
+    AnyElement, App, IntoElement, ParentElement, RenderOnce, SharedString, Styled as _, Window, div,
 };
 
 use crate::{ActiveTheme, StyledExt};
@@ -59,7 +58,7 @@ impl RenderOnce for Card {
                 heading = heading.child(
                     div()
                         .text_color(c.foreground)
-                        .text_size(px(16.))
+                        .text_size(theme.font_sizes.heading)
                         .child(title),
                 );
             }
@@ -67,7 +66,7 @@ impl RenderOnce for Card {
                 heading = heading.child(
                     div()
                         .text_color(c.muted_foreground)
-                        .text_size(px(12.))
+                        .text_size(theme.font_sizes.caption)
                         .child(description),
                 );
             }

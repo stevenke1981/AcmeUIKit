@@ -55,7 +55,7 @@ impl RenderOnce for Tabs {
                     } else {
                         c.muted_foreground
                     })
-                    .text_size(px(12.))
+                    .text_size(theme.font_sizes.caption)
                     .child(label)
             }))
     }

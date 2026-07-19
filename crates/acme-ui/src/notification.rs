@@ -161,14 +161,14 @@ impl Render for Notifications {
                             .child(
                                 div()
                                     .text_color(c.foreground)
-                                    .text_size(px(13.))
+                                    .text_size(cx.theme().font_sizes.body)
                                     .child(title),
                             )
                             .when_some(message, |this, msg| {
                                 this.child(
                                     div()
                                         .text_color(c.muted_foreground)
-                                        .text_size(px(11.))
+                                        .text_size(cx.theme().font_sizes.caption)
                                         .child(msg),
                                 )
                             }),

@@ -1,5 +1,50 @@
 use gpui::{App, Global, Hsla, Pixels, Window, hsla, px};
 
+/// Typography scale tokens following UI_DESIGN_PRINCIPLES.md §2.1:
+/// - Heading: 18–20px, Bold
+/// - Body: 13px, Regular
+/// - Caption: 11–12px
+#[derive(Debug, Clone, Copy)]
+pub struct FontSizes {
+    pub heading: Pixels,
+    pub body: Pixels,
+    pub caption: Pixels,
+}
+
+impl Default for FontSizes {
+    fn default() -> Self {
+        Self {
+            heading: px(18.),
+            body: px(13.),
+            caption: px(11.),
+        }
+    }
+}
+
+/// Spacing tokens following UI_DESIGN_PRINCIPLES.md §1.2.
+#[derive(Debug, Clone, Copy)]
+pub struct Spacing {
+    /// Between sibling widgets.
+    pub widget: Pixels,
+    /// Between related groups.
+    pub group: Pixels,
+    /// Between major sections.
+    pub section: Pixels,
+    /// Inner padding of panels / cards.
+    pub panel: Pixels,
+}
+
+impl Default for Spacing {
+    fn default() -> Self {
+        Self {
+            widget: px(8.),
+            group: px(16.),
+            section: px(24.),
+            panel: px(12.),
+        }
+    }
+}
+
 /// Creates an opaque GPUI HSLA color using familiar HSL units.
 pub fn hsl(h: f32, s: f32, l: f32) -> Hsla {
     hsla(h / 360., s / 100., l / 100., 1.)
@@ -39,6 +84,8 @@ pub struct ThemeColors {
 pub struct Theme {
     pub mode: ThemeMode,
     pub colors: ThemeColors,
+    pub font_sizes: FontSizes,
+    pub spacing: Spacing,
     pub radius_sm: Pixels,
     pub radius: Pixels,
     pub radius_lg: Pixels,
@@ -68,6 +115,8 @@ impl Theme {
                 warning: hsl(38., 92., 45.),
                 ring: hsl(221., 83., 63.),
             },
+            font_sizes: FontSizes::default(),
+            spacing: Spacing::default(),
             radius_sm: px(4.),
             radius: px(7.),
             radius_lg: px(12.),
@@ -95,6 +144,8 @@ impl Theme {
                 warning: hsl(38., 92., 55.),
                 ring: hsl(217., 91., 70.),
             },
+            font_sizes: FontSizes::default(),
+            spacing: Spacing::default(),
             radius_sm: px(4.),
             radius: px(7.),
             radius_lg: px(12.),

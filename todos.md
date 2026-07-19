@@ -1,40 +1,51 @@
 # todos.md
 
-## V1 已建立
+## V1 Foundation (已建立, 2026-07-19)
 - [x] Workspace 與 pinned GPUI dependencies
 - [x] Theme 與 Light/Dark tokens
 - [x] Size / Tone primitives
-- [x] Button
-- [x] Card
-- [x] Badge
-- [x] Progress
-- [x] Switch
-- [x] FieldShell
-- [x] Tabs
-- [x] Separator
-- [x] Skeleton
+- [x] Button, Card, Badge, Progress
+- [x] Switch, FieldShell, Tabs, Separator, Skeleton
 - [x] Interactive Gallery source
-- [x] Windows / Unix scripts
-- [x] CI workflow
+- [x] Windows / Unix scripts, CI workflow
 - [x] Architecture / API / roadmap documents
 
-## 本機首次驗證後更新 (已完成)
-- [x] 在具備 Rust 與網路的 Windows 環境執行 `cargo check --workspace --all-targets` ✅
-- [x] 修正 GPUI revision 對應的任何 API 差異
-  - 三處 `ParentElement` trait 未匯入 (badge, field, progress)
-  - Gallery 缺少 `InteractiveElement` / `StatefulInteractiveElement` / `AppContext` 等 trait 匯入
-  - `acme-ui` 元件未在 crate root re-export
-  - `overflow_y_scroll()` 需要先使用 `.id()` 取得 `Stateful<Div>`
-- [x] 執行 Gallery 視覺 smoke test ✅ (視窗正常開啟，無 panic)
-- [ ] 建立第一張 Windows Gallery 截圖 (需要手動操作截圖工具)
-- [x] 記錄冷編譯時間與 release binary 大小
-  - 冷編譯時間：約 2 分 33 秒 (首次含依賴下載)
-  - Release binary 大小：待確認 (未建置 release profile)
+## V1 驗證修復 (已完成)
+- [x] `ParentElement` trait 匯入 (badge, field, progress)
+- [x] Gallery 缺少的 trait 匯入 (`InteractiveElement`, `StatefulInteractiveElement`, `AppContext`)
+- [x] `acme-ui` crate root re-export
+- [x] `overflow_y_scroll()` .id() 修正
+- [x] Gallery 視窗正常開啟
 
-## V2
-- [ ] 可編輯 TextInput + IME
-- [ ] Checkbox / Radio
-- [ ] Dialog / Popover / Tooltip
-- [ ] Menu / Context Menu
-- [ ] Notification / Toast
-- [ ] Icon provider 與 SVG assets crate
+## V2 Components (已完成)
+- [x] TextInput (Entity+Render, 可編輯, IME 支援)
+- [x] Textarea (Entity+Render, 多行編輯, line-aware 游標)
+- [x] Checkbox
+- [x] Radio / RadioGroup
+- [x] Select (RenderOnce, dropdown)
+- [x] Combobox (Entity+Render, 可過濾 dropdown)
+- [x] Menu / Context Menu
+- [x] Dialog / Popover / Tooltip
+- [x] Notification / Toast
+- [x] Icon provider (`icon_provider.rs`)
+
+## V3 Components (已完成)
+- [x] **Pagination** (RenderOnce, 391 行, smart ellipsis, 10 單元測試)
+- [x] **Sidebar** (RenderOnce, 85 行, 主題化側欄)
+- [x] **Resizable** (Entity+Render, 198 行, 拖拉分隔條)
+- [x] **LoadingState** (`loading_state.rs`, 115 行, 4 列舉變體 + dispatch)
+- [x] **VirtualList** (`virtual_list.rs`, 74 行, GPUI `uniform_list` 包裝)
+
+## Theme & Design Principles (已完成)
+- [x] `FontSizes` token struct (heading/body/caption)
+- [x] `Spacing` token struct (widget/group/section/panel)
+- [x] 全元件字型大小遷移 (16 個 .rs, 27 處 `px(NN)` → `font_sizes.*`)
+- [x] `UI_DESIGN_PRINCIPLES.md` 產出 (egui 設計規則, 3 層字型, 8/16/24/12 間距)
+
+## Gallery (已完成)
+- [x] Gallery 已擴充至 ~965 行, 所有 V1+V2+V3 元件都有互動示範
+
+## 待辦
+- [ ] Gallery 視覺截圖 (需手動操作)
+- [ ] 合併 V2+V3 分支到 master
+- [ ] Release build 測試

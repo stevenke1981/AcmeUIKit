@@ -65,7 +65,7 @@ impl RenderOnce for FieldShell {
             .child(
                 div()
                     .text_color(c.foreground)
-                    .text_size(px(12.))
+                    .text_size(theme.font_sizes.caption)
                     .child(self.label),
             )
             .child(
@@ -83,7 +83,7 @@ impl RenderOnce for FieldShell {
                     } else {
                         c.muted_foreground
                     })
-                    .text_size(px(13.))
+                    .text_size(theme.font_sizes.body)
                     .child(text),
             );
 
@@ -95,7 +95,7 @@ impl RenderOnce for FieldShell {
                     } else {
                         c.muted_foreground
                     })
-                    .text_size(px(11.))
+                    .text_size(theme.font_sizes.caption)
                     .child(helper),
             );
         }

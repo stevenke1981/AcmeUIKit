@@ -1,7 +1,8 @@
 use acme_ui::{
-    ActiveTheme, Badge, Button, Card, Checkbox, Dialog, FieldShell, Icon, IconName, Menu, MenuItem,
-    Popover, Progress, Radio, RadioGroup, Separator, Skeleton, StyledExt, Switch, Tabs, TextInput,
-    Theme, ThemeMode, Tooltip,
+    ActiveTheme, Badge, Button, Card, Checkbox, Combobox, ComboboxOption, Dialog, Direction,
+    FieldShell, Icon, IconName, Menu, MenuItem, Pagination, Popover, Progress, Radio, RadioGroup,
+    Resizable, Select, SelectOption, Separator, Sidebar, Skeleton, StyledExt, Switch, Tabs,
+    TextInput, Textarea, Theme, ThemeMode, Tooltip,
 };
 use gpui::{
     AppContext as _, Context, ElementId, Entity, InteractiveElement as _, IntoElement,
@@ -26,12 +27,42 @@ struct Gallery {
     menu_selected: Option<usize>,
     #[allow(dead_code)]
     v2_section: &'static str,
+    // V2b state
+    textarea_entity: Entity<Textarea>,
+    combobox_entity: Entity<Combobox>,
+    resizable_entity: Entity<Resizable>,
+    select_open: bool,
+    select_selected: Option<usize>,
+    pagination_current: usize,
 }
 
 impl Gallery {
     fn new(cx: &mut Context<Self>) -> Self {
         let text_input_entity =
             cx.new(|cx| TextInput::new("text-input-demo", cx).placeholder("Type something..."));
+        let textarea_entity = cx.new(|cx| {
+            Textarea::new("textarea-demo", cx)
+                .placeholder("Tell us about yourself…")
+                .rows(4)
+        });
+        let combobox_entity = cx.new(|cx| {
+            Combobox::new("combobox-demo", cx)
+                .placeholder("Search fruit…")
+                .options(vec![
+                    ComboboxOption::new("Apple", "apple"),
+                    ComboboxOption::new("Banana", "banana"),
+                    ComboboxOption::new("Cherry", "cherry"),
+                    ComboboxOption::new("Grape", "grape"),
+                    ComboboxOption::new("Orange", "orange"),
+                    ComboboxOption::new("Strawberry", "strawberry"),
+                    ComboboxOption::new("Watermelon", "watermelon"),
+                ])
+        });
+        let resizable_entity = cx.new(|cx| {
+            Resizable::new("demo-resizable", cx)
+                .initial_split(0.5)
+                .direction(Direction::Horizontal)
+        });
         Self {
             dark: false,
             counter: 0,
@@ -46,6 +77,12 @@ impl Gallery {
             menu_open: false,
             menu_selected: None,
             v2_section: "Inputs",
+            textarea_entity,
+            combobox_entity,
+            resizable_entity,
+            select_open: false,
+            select_selected: None,
+            pagination_current: 1,
         }
     }
 
@@ -689,6 +726,103 @@ impl Render for Gallery {
                     ),
             );
 
+        // ── V2/V3 New Controls card ──
+
+        let new_controls_card = Card::new()
+            .title("New V2/V3 Controls")
+            .description("Textarea, Select, Combobox, Pagination, Sidebar, Resizable")
+            // Textarea row
+            .child(Separator::new())
+            .child(div().child("Textarea (V2)"))
+            .child(self.textarea_entity.clone())
+            // Select row
+            .child(Separator::new())
+            .child(div().child("Select (V2)"))
+            .child(
+                div().flex().gap_2().items_center()
+                    .child(
+                        Button::new("toggle-select")
+                            .small().secondary()
+                            .label(if self.select_open { "Close" } else { "Open" })
+                            .on_click(cx.listener(|this, _, _, cx| {
+                                this.select_open = !this.select_open;
+                                cx.notify();
+                            }))
+                    )
+                    .child(
+                        Select::new("demo-select")
+                            .placeholder("Choose one...")
+                            .options(vec![
+                                SelectOption::new("Option A", "a"),
+                                SelectOption::new("Option B", "b"),
+                                SelectOption::new("Option C", "c"),
+                            ])
+                            .selected(self.select_selected.unwrap_or(99))
+                            .open(self.select_open)
+                            .on_select({
+                                let handle = cx.entity().downgrade();
+                                move |index, _event, _window, cx| {
+                                    if let Some(handle) = handle.upgrade() {
+                                        handle.update(cx, |this, cx| {
+                                            this.select_selected = Some(index);
+                                            this.select_open = false;
+                                            cx.notify();
+                                        });
+                                    }
+                                }
+                            })
+                    )
+            )
+            // Combobox row
+            .child(Separator::new())
+            .child(div().child("Combobox (V2)"))
+            .child(self.combobox_entity.clone())
+            // Pagination row
+            .child(Separator::new())
+            .child(div().child("Pagination (V3)"))
+            .child(
+                Pagination::new("demo-pagination")
+                    .current(self.pagination_current)
+                    .total(10)
+                    .on_page_change({
+                        let handle = cx.entity().downgrade();
+                        move |page, _event, _window, cx| {
+                            if let Some(handle) = handle.upgrade() {
+                                handle.update(cx, |this, cx| {
+                                    this.pagination_current = page;
+                                    cx.notify();
+                                });
+                            }
+                        }
+                    })
+            )
+            // Sidebar + Resizable row
+            .child(Separator::new())
+            .child(div().child("Sidebar (V3) + Resizable (V3)"))
+            .child(
+                div().h(px(200.)).flex().w_full()
+                    .child(
+                        Sidebar::new("demo-sidebar")
+                            .title("Navigation")
+                            .width(px(160.))
+                            .child(div().child("Item 1"))
+                            .child(div().child("Item 2"))
+                            .child(div().child("Item 3"))
+                    )
+                    .child(
+                        div().flex_1().bg(c.surface)
+                            .child(" Main Content ")
+                    )
+            )
+            .child(Separator::new())
+            .child(
+                div().child("Resizable (V3) — drag the divider:")
+            )
+            .child(
+                div().h(px(100.)).w_full()
+                    .child(self.resizable_entity.clone())
+            );
+
         // ── V2 Icons card ──
 
         let icons_card = Card::new()
@@ -798,6 +932,8 @@ impl Render for Gallery {
                     // V2 row
                     .child(selection_card)
                     .child(overlays_card)
+                    // V2/V3 row
+                    .child(new_controls_card)
                     // V2 row
                     .child(icons_card)
                     .child(notification_card),

@@ -60,7 +60,7 @@ impl RenderOnce for Badge {
             .rounded_full()
             .bg(background)
             .text_color(foreground)
-            .text_size(px(11.))
+            .text_size(cx.theme().font_sizes.caption)
             .child(self.label)
     }
 }
