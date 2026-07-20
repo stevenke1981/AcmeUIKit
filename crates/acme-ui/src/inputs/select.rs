@@ -71,6 +71,7 @@ pub struct Select {
     selected: Option<usize>,
     open: bool,
     disabled: bool,
+    invalid: bool,
     on_select: Option<SelectHandler>,
 }
 
@@ -84,6 +85,7 @@ impl Select {
             selected: None,
             open: false,
             disabled: false,
+            invalid: false,
             on_select: None,
         }
     }
@@ -118,6 +120,12 @@ impl Select {
         self
     }
 
+    /// Marks the control invalid and uses the semantic danger boundary.
+    pub fn invalid(mut self, invalid: bool) -> Self {
+        self.invalid = invalid;
+        self
+    }
+
     /// Registers a click handler that fires when a non-disabled option is
     /// clicked.
     ///
@@ -149,12 +157,12 @@ impl RenderOnce for Select {
         let mut trigger = div()
             .id(self.id.clone())
             .h_flex()
-            .h(px(36.))
+            .h(theme.controls.medium)
             .px_3()
             .gap_2()
             .rounded(theme.radius)
             .border_1()
-            .border_color(c.border)
+            .border_color(if self.invalid { c.danger } else { c.border })
             .bg(c.surface)
             .text_size(theme.font_sizes.body)
             .text_color(if disabled {

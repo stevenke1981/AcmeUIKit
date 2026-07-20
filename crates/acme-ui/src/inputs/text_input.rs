@@ -2,7 +2,8 @@ use std::rc::Rc;
 
 use gpui::{
     App, Context, ElementId, FocusHandle, InteractiveElement as _, IntoElement, KeyDownEvent,
-    ParentElement as _, Render, SharedString, Styled as _, Window, div, px,
+    ParentElement as _, Render, SharedString, Styled as _, Window, div,
+    prelude::FluentBuilder as _,
 };
 
 use crate::ActiveTheme;
@@ -30,6 +31,8 @@ pub struct TextInput {
     focus_handle: FocusHandle,
     placeholder: SharedString,
     disabled: bool,
+    invalid: bool,
+    loading: bool,
     on_input: Option<InputHandler>,
 }
 
@@ -46,6 +49,8 @@ impl TextInput {
             focus_handle: cx.focus_handle(),
             placeholder: SharedString::default(),
             disabled: false,
+            invalid: false,
+            loading: false,
             on_input: None,
         }
     }
@@ -59,6 +64,18 @@ impl TextInput {
     /// Disable user interaction.
     pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = disabled;
+        self
+    }
+
+    /// Marks the field invalid and displays the danger focus boundary.
+    pub fn invalid(mut self, invalid: bool) -> Self {
+        self.invalid = invalid;
+        self
+    }
+
+    /// Shows a non-blocking loading indicator and prevents editing.
+    pub fn loading(mut self, loading: bool) -> Self {
+        self.loading = loading;
         self
     }
 
@@ -139,6 +156,8 @@ impl Render for TextInput {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let c = cx.theme().colors;
         let disabled = self.disabled;
+        let loading = self.loading;
+        let invalid = self.invalid;
         let focused = self.focus_handle.is_focused(window);
 
         // ── content (text / placeholder / cursor) ──────────────────────────
@@ -173,13 +192,19 @@ impl Render for TextInput {
         let mut input = div()
             .id(self.id.clone())
             .track_focus(&self.focus_handle)
-            .h(px(36.))
+            .h(cx.theme().controls.medium)
             .px_3()
             .flex()
             .items_center()
             .rounded(cx.theme().radius)
             .border_1()
-            .border_color(if focused { c.ring } else { c.border })
+            .border_color(if invalid {
+                c.danger
+            } else if focused {
+                c.ring
+            } else {
+                c.border
+            })
             .bg(c.background)
             .text_color(if disabled {
                 c.muted_foreground
@@ -187,9 +212,12 @@ impl Render for TextInput {
                 c.foreground
             })
             .text_size(cx.theme().font_sizes.body)
-            .child(content);
+            .child(content)
+            .when(loading, |this| {
+                this.child(div().text_color(c.muted_foreground).child("…"))
+            });
 
-        if !disabled {
+        if !disabled && !loading {
             input = input.on_key_down(cx.listener(
                 move |this: &mut TextInput, event: &KeyDownEvent, window, cx| {
                     this.handle_key(event, window, cx);
