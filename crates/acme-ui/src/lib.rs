@@ -15,8 +15,8 @@ pub mod overlay;
 pub use foundations::primitives::{Size, Tone};
 pub use foundations::styled::StyledExt;
 pub use foundations::theme::{
-    ActiveTheme, ControlSizes, Density, FontSizes, Motion, RadiusScale, Spacing, TextStyle, Theme,
-    ThemeColors, ThemeMode, Typography, hsl,
+    ActiveTheme, ControlSizes, Density, FontSizes, Motion, RadiusScale, Shadows, Spacing,
+    TextStyle, Theme, ThemeColors, ThemeMode, Typography, hsl,
 };
 
 pub use charts::area_chart::AreaChart;

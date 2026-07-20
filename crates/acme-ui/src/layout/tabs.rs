@@ -1,5 +1,5 @@
 use gpui::{
-    App, IntoElement, ParentElement as _, RenderOnce, SharedString, Styled as _, Window, div, px,
+    App, IntoElement, ParentElement as _, RenderOnce, SharedString, Styled as _, Window, div,
 };
 
 use crate::ActiveTheme;
@@ -44,8 +44,8 @@ impl RenderOnce for Tabs {
             .children(self.labels.into_iter().enumerate().map(|(index, label)| {
                 let selected = index == self.selected;
                 div()
-                    .h(px(30.))
-                    .px_3()
+                    .h(theme.controls.medium)
+                    .px(theme.spacing.widget)
                     .flex()
                     .items_center()
                     .rounded(theme.radius_sm)
@@ -55,7 +55,7 @@ impl RenderOnce for Tabs {
                     } else {
                         c.muted_foreground
                     })
-                    .text_size(theme.font_sizes.caption)
+                    .text_size(theme.typography.label.size)
                     .child(label)
             }))
     }

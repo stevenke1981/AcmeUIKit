@@ -127,6 +127,14 @@ impl Default for Motion {
     }
 }
 
+/// Elevation shadow tokens represented as intensity hints for GPUI surfaces.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct Shadows {
+    pub small: Pixels,
+    pub medium: Pixels,
+    pub large: Pixels,
+}
+
 /// Typography scale tokens following UI_DESIGN_PRINCIPLES.md §2.1:
 /// - Heading: 18–20px, Bold
 /// - Body: 13px, Regular
@@ -188,6 +196,22 @@ pub enum ThemeMode {
 /// Semantic color tokens consumed by components.
 #[derive(Debug, Clone, Copy)]
 pub struct ThemeColors {
+    pub app_background: Hsla,
+    pub panel_background: Hsla,
+    pub elevated_surface: Hsla,
+    pub overlay_surface: Hsla,
+    pub foreground_secondary: Hsla,
+    pub foreground_tertiary: Hsla,
+    pub border_subtle: Hsla,
+    pub border_default: Hsla,
+    pub border_strong: Hsla,
+    pub primary_pressed: Hsla,
+    pub primary_soft: Hsla,
+    pub success_soft: Hsla,
+    pub warning_soft: Hsla,
+    pub danger_soft: Hsla,
+    pub selection: Hsla,
+    pub focus_ring: Hsla,
     pub background: Hsla,
     pub surface: Hsla,
     pub foreground: Hsla,
@@ -221,6 +245,7 @@ pub struct Theme {
     pub controls: ControlSizes,
     pub density: Density,
     pub motion: Motion,
+    pub shadows: Shadows,
 }
 
 impl Global for Theme {}
@@ -230,6 +255,22 @@ impl Theme {
         Self {
             mode: ThemeMode::Light,
             colors: ThemeColors {
+                app_background: hsl(220., 20., 98.),
+                panel_background: hsl(220., 18., 97.),
+                elevated_surface: hsl(0., 0., 100.),
+                overlay_surface: hsl(0., 0., 100.),
+                foreground_secondary: hsl(218., 14., 38.),
+                foreground_tertiary: hsl(218., 10., 52.),
+                border_subtle: hsl(215., 20., 93.),
+                border_default: hsl(215., 18., 87.),
+                border_strong: hsl(215., 18., 75.),
+                primary_pressed: hsl(221., 78., 42.),
+                primary_soft: hsl(221., 82., 95.),
+                success_soft: hsl(142., 60., 93.),
+                warning_soft: hsl(38., 80., 92.),
+                danger_soft: hsl(0., 70., 94.),
+                selection: hsl(221., 82., 95.),
+                focus_ring: hsl(221., 75., 52.),
                 background: hsl(210., 20., 98.),
                 surface: hsl(0., 0., 100.),
                 foreground: hsl(222., 47., 11.),
@@ -257,6 +298,7 @@ impl Theme {
             controls: ControlSizes::default(),
             density: Density::Comfortable,
             motion: Motion::default(),
+            shadows: Shadows::default(),
         }
     }
 
@@ -264,6 +306,22 @@ impl Theme {
         Self {
             mode: ThemeMode::Dark,
             colors: ThemeColors {
+                app_background: hsl(222., 24., 8.),
+                panel_background: hsl(222., 22., 10.),
+                elevated_surface: hsl(222., 18., 15.),
+                overlay_surface: hsl(222., 18., 17.),
+                foreground_secondary: hsl(215., 14., 72.),
+                foreground_tertiary: hsl(215., 11., 58.),
+                border_subtle: hsl(220., 15., 17.),
+                border_default: hsl(220., 14., 23.),
+                border_strong: hsl(220., 14., 32.),
+                primary_pressed: hsl(217., 78., 56.),
+                primary_soft: hsl(217., 38., 18.),
+                success_soft: hsl(142., 35., 18.),
+                warning_soft: hsl(38., 35., 20.),
+                danger_soft: hsl(0., 35., 20.),
+                selection: hsl(217., 38., 18.),
+                focus_ring: hsl(217., 82., 62.),
                 background: hsl(222., 47., 7.),
                 surface: hsl(222., 40., 10.),
                 foreground: hsl(210., 40., 96.),
@@ -291,6 +349,7 @@ impl Theme {
             controls: ControlSizes::default(),
             density: Density::Comfortable,
             motion: Motion::default(),
+            shadows: Shadows::default(),
         }
     }
 

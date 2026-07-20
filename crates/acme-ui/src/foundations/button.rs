@@ -30,6 +30,7 @@ pub struct Button {
     size: Size,
     disabled: bool,
     selected: bool,
+    loading: bool,
     on_click: Option<ClickHandler>,
 }
 
@@ -42,6 +43,7 @@ impl Button {
             size: Size::Medium,
             disabled: false,
             selected: false,
+            loading: false,
             on_click: None,
         }
     }
@@ -103,6 +105,12 @@ impl Button {
         self
     }
 
+    /// Shows a compact loading indicator while preserving the button size.
+    pub fn loading(mut self, loading: bool) -> Self {
+        self.loading = loading;
+        self
+    }
+
     pub fn on_click(
         mut self,
         handler: impl Fn(&ClickEvent, &mut Window, &mut App) + 'static,
@@ -127,6 +135,7 @@ impl RenderOnce for Button {
 
         let selected_border = if self.selected { c.ring } else { border };
         let disabled = self.disabled;
+        let loading = self.loading;
         let handler = self.on_click;
         let control_height = match self.size {
             Size::ExtraSmall => theme.controls.xs,
@@ -152,19 +161,23 @@ impl RenderOnce for Button {
             .border_1()
             .border_color(selected_border)
             .bg(background)
-            .text_color(if disabled {
+            .text_color(if disabled || loading {
                 c.muted_foreground
             } else {
                 foreground
             })
             .text_size(text_size)
-            .child(self.label)
-            .when(!disabled, |this| {
+            .child(if loading {
+                SharedString::from("…")
+            } else {
+                self.label
+            })
+            .when(!disabled && !loading, |this| {
                 this.cursor_pointer().hover(move |style| style.bg(hover))
             });
 
         match handler {
-            Some(handler) if !disabled => button
+            Some(handler) if !disabled && !loading => button
                 .on_click(move |event, window, cx| handler(event, window, cx))
                 .into_any_element(),
             _ => button.into_any_element(),

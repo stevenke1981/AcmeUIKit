@@ -72,14 +72,20 @@ impl RenderOnce for Sidebar {
         if let Some(title) = self.title {
             panel = panel.child(
                 div()
-                    .px_4()
-                    .py(px(14.))
+                    .px(cx.theme().spacing.group)
+                    .py(cx.theme().spacing.widget)
                     .text_color(c.foreground)
-                    .text_size(cx.theme().font_sizes.body)
+                    .text_size(cx.theme().typography.title.size)
                     .child(title),
             );
         }
 
-        panel.child(div().flex_1().px_4().py_2().children(self.children))
+        panel.child(
+            div()
+                .flex_1()
+                .px(cx.theme().spacing.group)
+                .py(cx.theme().spacing.widget)
+                .children(self.children),
+        )
     }
 }
