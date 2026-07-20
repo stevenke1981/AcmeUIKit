@@ -50,9 +50,9 @@ impl RenderOnce for Switch {
         let handler = self.on_click;
         let track = div()
             .id(self.id)
-            .w(px(42.))
-            .h(px(24.))
-            .px(px(3.))
+            .w(cx.theme().controls.large)
+            .h(cx.theme().controls.xs)
+            .px(cx.theme().radius_scale.xs)
             .flex()
             .items_center()
             .rounded_full()

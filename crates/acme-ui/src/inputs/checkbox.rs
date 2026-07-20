@@ -3,7 +3,7 @@ use std::rc::Rc;
 use gpui::{
     App, ClickEvent, ElementId, InteractiveElement as _, IntoElement, ParentElement as _,
     RenderOnce, SharedString, StatefulInteractiveElement as _, Styled as _, Window, div,
-    prelude::FluentBuilder as _, px,
+    prelude::FluentBuilder as _,
 };
 
 use crate::ActiveTheme;
@@ -71,7 +71,7 @@ impl RenderOnce for Checkbox {
         let handler = self.on_click;
 
         // ── check-box square ───────────────────────────────────────────────
-        let check_size = px(18.);
+        let check_size = cx.theme().controls.small;
         let box_el = div()
             .size(check_size)
             .flex()

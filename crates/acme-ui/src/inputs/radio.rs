@@ -79,7 +79,7 @@ impl RenderOnce for Radio {
         let disabled = self.disabled;
         let handler = self.on_click;
 
-        let circle_size = px(18.);
+        let circle_size = cx.theme().controls.small;
         let dot_size = px(10.);
 
         // ── outer circle ───────────────────────────────────────────────────
