@@ -14,7 +14,10 @@ pub mod overlay;
 // Re-exports (flat public API — backward compatible)
 pub use foundations::primitives::{Size, Tone};
 pub use foundations::styled::StyledExt;
-pub use foundations::theme::{ActiveTheme, FontSizes, Spacing, Theme, ThemeColors, ThemeMode, hsl};
+pub use foundations::theme::{
+    ActiveTheme, ControlSizes, Density, FontSizes, Motion, RadiusScale, Spacing, TextStyle, Theme,
+    ThemeColors, ThemeMode, Typography, hsl,
+};
 
 pub use charts::area_chart::AreaChart;
 pub use charts::candlestick::{Candlestick, CandlestickChart};

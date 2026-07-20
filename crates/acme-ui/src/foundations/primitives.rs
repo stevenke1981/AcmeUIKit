@@ -14,9 +14,9 @@ impl Size {
     pub fn height(self) -> Pixels {
         match self {
             Self::ExtraSmall => px(24.),
-            Self::Small => px(30.),
-            Self::Medium => px(36.),
-            Self::Large => px(42.),
+            Self::Small => px(28.),
+            Self::Medium => px(32.),
+            Self::Large => px(38.),
         }
     }
 
@@ -24,8 +24,8 @@ impl Size {
         match self {
             Self::ExtraSmall => px(8.),
             Self::Small => px(10.),
-            Self::Medium => px(14.),
-            Self::Large => px(18.),
+            Self::Medium => px(12.),
+            Self::Large => px(16.),
         }
     }
 
@@ -33,8 +33,8 @@ impl Size {
         match self {
             Self::ExtraSmall => px(11.),
             Self::Small => px(12.),
-            Self::Medium => px(14.),
-            Self::Large => px(15.),
+            Self::Medium => px(13.),
+            Self::Large => px(14.),
         }
     }
 }

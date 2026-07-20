@@ -8,8 +8,11 @@
 - Light/Dark 主題與十個 V1 元件。
 - 完整規格、架構、API、Roadmap、測試與 Agent 規範。
 - Windows/Unix 開發腳本與 GitHub Actions。
+- 依 Design Bible v1.0 對齊的 Typography、Density、Radius、Control Size 與 Motion tokens。
+- 保留既有 Theme 欄位並新增 token API，避免既有元件破壞性變更。
+- Button Size 尺寸對齊 XS/S/M/L = 24/28/32/38 px。
 
-## 驗證狀態 (2026-07-19)
+## 驗證狀態 (2026-07-20)
 
 在 Windows 11 + Rust 1.94.1 nightly 環境完成全流程驗證：
 
@@ -20,7 +23,7 @@
 | `cargo check --workspace --all-targets` | ✅ |
 | `cargo clippy --workspace --all-targets -- -D warnings` | ✅ |
 | `cargo fmt --all -- --check` | ✅ |
-| `cargo test --workspace` | ✅ (1 test) |
+| `cargo test --workspace` | ✅ (14 unit tests；116 doctests ignored) |
 | Gallery 視窗正常啟動 | ✅ |
 
 ### 已知差異
@@ -28,6 +31,7 @@
 1. **工具鏈需求**: GPUI pinned revision (`1a246efd`) 使用 `std::hint::cold_path()` — 需要 Rust nightly。已在 `rust-toolchain.toml` 更新為 `nightly`。
 2. **GPUI API 差異**: 原始專案基於 Zed 專案內部 API snapshot 設計，有數處 trait import 與方法呼叫需修正（詳見 `todos.md`「本機首次驗證後更新」）。
 3. **Gallery 截圖**: 尚未建立正式截圖，需手動操作。
+4. **Visual QA**: 本次完成 token/API 與編譯驗證，尚未自動化 1280×800、1024×700、800×600 的 Light/Dark 截圖差異檢查。
 
 ### 首次開發環境設定
 

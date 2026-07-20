@@ -1,4 +1,131 @@
-use gpui::{App, Global, Hsla, Pixels, Window, hsla, px};
+use gpui::{App, FontWeight, Global, Hsla, Pixels, Window, hsla, px};
+
+/// A typography token with size, line height, and weight.
+#[derive(Debug, Clone, Copy)]
+pub struct TextStyle {
+    pub size: Pixels,
+    pub line_height: Pixels,
+    pub weight: FontWeight,
+    pub letter_spacing: Pixels,
+}
+
+/// Named typography scale from the Acme Design Bible.
+#[derive(Debug, Clone, Copy)]
+pub struct Typography {
+    pub display: TextStyle,
+    pub title_large: TextStyle,
+    pub title: TextStyle,
+    pub body: TextStyle,
+    pub body_compact: TextStyle,
+    pub label: TextStyle,
+    pub caption: TextStyle,
+}
+
+impl Default for Typography {
+    fn default() -> Self {
+        let regular = |size, line_height| TextStyle {
+            size: px(size),
+            line_height: px(line_height),
+            weight: FontWeight(400.),
+            letter_spacing: px(0.),
+        };
+        let semibold = |size, line_height| TextStyle {
+            size: px(size),
+            line_height: px(line_height),
+            weight: FontWeight(600.),
+            letter_spacing: px(0.),
+        };
+        Self {
+            display: semibold(24., 32.),
+            title_large: semibold(20., 28.),
+            title: semibold(16., 24.),
+            body: regular(13., 20.),
+            body_compact: regular(12., 18.),
+            label: TextStyle {
+                size: px(12.),
+                line_height: px(16.),
+                weight: FontWeight(500.),
+                letter_spacing: px(0.),
+            },
+            caption: regular(11., 16.),
+        }
+    }
+}
+
+/// Three supported desktop density presets.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum Density {
+    Compact,
+    #[default]
+    Comfortable,
+    Spacious,
+}
+
+/// Radius tokens for controls and surfaces.
+#[derive(Debug, Clone, Copy)]
+pub struct RadiusScale {
+    pub none: Pixels,
+    pub xs: Pixels,
+    pub sm: Pixels,
+    pub md: Pixels,
+    pub lg: Pixels,
+    pub xl: Pixels,
+    pub pill: Pixels,
+}
+
+impl Default for RadiusScale {
+    fn default() -> Self {
+        Self {
+            none: px(0.),
+            xs: px(3.),
+            sm: px(5.),
+            md: px(7.),
+            lg: px(10.),
+            xl: px(14.),
+            pill: px(999.),
+        }
+    }
+}
+
+/// Standard control dimensions.
+#[derive(Debug, Clone, Copy)]
+pub struct ControlSizes {
+    pub xs: Pixels,
+    pub small: Pixels,
+    pub medium: Pixels,
+    pub large: Pixels,
+}
+
+impl Default for ControlSizes {
+    fn default() -> Self {
+        Self {
+            xs: px(24.),
+            small: px(28.),
+            medium: px(32.),
+            large: px(38.),
+        }
+    }
+}
+
+/// Motion duration tokens in milliseconds.
+#[derive(Debug, Clone, Copy)]
+pub struct Motion {
+    pub instant: u64,
+    pub fast: u64,
+    pub normal: u64,
+    pub slow: u64,
+}
+
+impl Default for Motion {
+    fn default() -> Self {
+        Self {
+            instant: 0,
+            fast: 80,
+            normal: 140,
+            slow: 220,
+        }
+    }
+}
 
 /// Typography scale tokens following UI_DESIGN_PRINCIPLES.md §2.1:
 /// - Heading: 18–20px, Bold
@@ -89,6 +216,11 @@ pub struct Theme {
     pub radius_sm: Pixels,
     pub radius: Pixels,
     pub radius_lg: Pixels,
+    pub typography: Typography,
+    pub radius_scale: RadiusScale,
+    pub controls: ControlSizes,
+    pub density: Density,
+    pub motion: Motion,
 }
 
 impl Global for Theme {}
@@ -120,6 +252,11 @@ impl Theme {
             radius_sm: px(4.),
             radius: px(7.),
             radius_lg: px(12.),
+            typography: Typography::default(),
+            radius_scale: RadiusScale::default(),
+            controls: ControlSizes::default(),
+            density: Density::Comfortable,
+            motion: Motion::default(),
         }
     }
 
@@ -149,6 +286,11 @@ impl Theme {
             radius_sm: px(4.),
             radius: px(7.),
             radius_lg: px(12.),
+            typography: Typography::default(),
+            radius_scale: RadiusScale::default(),
+            controls: ControlSizes::default(),
+            density: Density::Comfortable,
+            motion: Motion::default(),
         }
     }
 

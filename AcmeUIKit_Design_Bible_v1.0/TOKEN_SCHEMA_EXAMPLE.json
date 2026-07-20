@@ -1,0 +1,59 @@
+{
+  "version": "1.0",
+  "color": {
+    "light": {
+      "app_background": "hsl(220 20% 98%)",
+      "panel_background": "hsl(220 18% 97%)",
+      "surface": "hsl(0 0% 100%)",
+      "text_primary": "hsl(222 35% 12%)",
+      "text_secondary": "hsl(218 14% 38%)",
+      "border_subtle": "hsl(215 20% 93%)",
+      "primary": "hsl(221 75% 52%)"
+    },
+    "dark": {
+      "app_background": "hsl(222 24% 8%)",
+      "panel_background": "hsl(222 22% 10%)",
+      "surface": "hsl(222 20% 12%)",
+      "text_primary": "hsl(210 24% 95%)",
+      "text_secondary": "hsl(215 14% 72%)",
+      "border_subtle": "hsl(220 15% 17%)",
+      "primary": "hsl(217 82% 62%)"
+    }
+  },
+  "spacing": [
+    0,
+    2,
+    4,
+    6,
+    8,
+    12,
+    16,
+    20,
+    24,
+    32,
+    40,
+    48,
+    64
+  ],
+  "radius": {
+    "none": 0,
+    "xs": 3,
+    "sm": 5,
+    "md": 7,
+    "lg": 10,
+    "xl": 14,
+    "pill": 999
+  },
+  "motion_ms": {
+    "instant": 0,
+    "fast": 80,
+    "normal": 140,
+    "slow": 220
+  },
+  "control_height": {
+    "xs": 24,
+    "sm": 28,
+    "md": 32,
+    "lg": 38
+  }
+}
