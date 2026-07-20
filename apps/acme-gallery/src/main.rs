@@ -334,7 +334,13 @@ impl Render for Gallery {
                         .child(Button::new("secondary").secondary().label("Secondary"))
                         .child(Button::new("danger").danger().label("Danger"))
                         .child(Button::new("ghost").ghost().label("Ghost"))
-                        .child(Button::new("disabled").label("Disabled").disabled(true)),
+                        .child(Button::new("disabled").label("Disabled").disabled(true))
+                        .child(
+                            Button::new("loading")
+                                .primary()
+                                .label("Loading")
+                                .loading(true),
+                        ),
                 )
                 .child(Separator::new())
                 .child(
