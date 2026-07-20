@@ -58,7 +58,7 @@ pub use foundations::alert::Alert;
 pub use foundations::avatar::Avatar;
 pub use foundations::badge::Badge;
 pub use foundations::button::Button;
-pub use foundations::card::Card;
+pub use foundations::card::{Card, CardVariant};
 pub use foundations::empty_state::EmptyState;
 pub use foundations::error_state::ErrorState;
 pub use foundations::icon_button::IconButton;

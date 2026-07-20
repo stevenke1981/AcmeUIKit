@@ -360,6 +360,7 @@ impl Render for Gallery {
                 );
 
         let controls_card = Card::new()
+            .elevated()
             .title("Controls")
             .description("Caller-controlled state with immediate entity updates")
             .child(
