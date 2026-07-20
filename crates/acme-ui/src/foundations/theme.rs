@@ -298,6 +298,14 @@ impl Theme {
         cx.global::<Self>()
     }
 
+    /// Sets the active density and refreshes the current window.
+    pub fn set_density(density: Density, window: &mut Window, cx: &mut App) {
+        if cx.has_global::<Self>() {
+            cx.global_mut::<Self>().density = density;
+        }
+        window.refresh();
+    }
+
     pub fn set_mode(mode: ThemeMode, window: &mut Window, cx: &mut App) {
         let next = match mode {
             ThemeMode::Light => Self::light(),
@@ -340,5 +348,16 @@ mod tests {
             Theme::light().colors.background,
             Theme::dark().colors.background
         );
+    }
+
+    #[test]
+    fn design_bible_tokens_have_expected_control_scale() {
+        let theme = Theme::light();
+        assert_eq!(theme.controls.xs, px(24.));
+        assert_eq!(theme.controls.small, px(28.));
+        assert_eq!(theme.controls.medium, px(32.));
+        assert_eq!(theme.controls.large, px(38.));
+        assert_eq!(theme.typography.body.size, px(13.));
+        assert_eq!(theme.radius_scale.md, px(7.));
     }
 }

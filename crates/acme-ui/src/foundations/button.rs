@@ -128,10 +128,22 @@ impl RenderOnce for Button {
         let selected_border = if self.selected { c.ring } else { border };
         let disabled = self.disabled;
         let handler = self.on_click;
+        let control_height = match self.size {
+            Size::ExtraSmall => theme.controls.xs,
+            Size::Small => theme.controls.small,
+            Size::Medium => theme.controls.medium,
+            Size::Large => theme.controls.large,
+        };
+        let text_size = match self.size {
+            Size::ExtraSmall => theme.typography.caption.size,
+            Size::Small => theme.typography.body_compact.size,
+            Size::Medium => theme.typography.body.size,
+            Size::Large => theme.typography.body.size,
+        };
 
         let button = div()
             .id(self.id)
-            .h(self.size.height())
+            .h(control_height)
             .px(self.size.horizontal_padding())
             .flex()
             .items_center()
@@ -145,7 +157,7 @@ impl RenderOnce for Button {
             } else {
                 foreground
             })
-            .text_size(self.size.text_size())
+            .text_size(text_size)
             .child(self.label)
             .when(!disabled, |this| {
                 this.cursor_pointer().hover(move |style| style.bg(hover))
