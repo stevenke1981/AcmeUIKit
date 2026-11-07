@@ -17,9 +17,19 @@ A clean-room Rust desktop GUI component library built on **GPUI** (Zed's native 
 | **V9 DataGrid** | DataGrid (Entity-based, sort/filter/edit/keyboard nav/CSV export) | ✅ |
 | **V10 Content & Media** | RichText, HtmlView, LineNumbers, DiffViewer, MarkdownPreview, DocumentOutline, FindReplace, LogViewer, HexViewer, ImageView, AvatarGroup, Carousel, Lightbox, Canvas, ZoomView, PanView, ThumbnailStrip, Cropper, AnnotationLayer | ✅ |
 | **P2 Charts** | PieChart, DonutChart, Gauge, Sparkline, LineChart, AreaChart, ScatterChart, Histogram, Heatmap, CandlestickChart, StreamingChart + shared chart_base (Scale, Axis, Legend, ChartColors) | ✅ |
-| **P2 Infrastructure** | Component States (loading/disabled overlays, validation), Accessibility (40+ ARIA roles, 17 attributes), Focus (FocusTrap, RovingTabIndex, keyboard handlers), Overlay Manager (ModalBackdrop, AutoPositioner, ClickOutsideListener, FocusRestore) | ✅ |
+| **P2 Infrastructure** | Component States (loading/disabled overlays, validation), Accessibility reference types (not connected to components or the native accessibility tree), Focus (FocusTrap, RovingTabIndex, keyboard handlers), Overlay Manager (ModalBackdrop, AutoPositioner, ClickOutsideListener, FocusRestore) | ✅ |
 
-**Total**: 132 source files, ~16500+ lines, zero warnings.
+**Source layout**: 150 Rust files under `crates/acme-ui/src` at this baseline (excluding Gallery and tests). This is an implementation inventory, not a production-readiness or accessibility certification.
+
+## Accessibility status
+
+`AriaRole` and `AriaAttrs` are exported reference/builder types. Components do not
+consume them, and they are not connected to GPUI's native accessibility tree.
+The `aria_label` helper only builds a string; `sr_only_label` only clips visual
+content. Neither establishes screen-reader support. Reduced-motion and
+high-contrast preference helpers currently return `false`; they do not read OS
+settings. Screen-reader behavior and end-to-end keyboard accessibility have not
+been verified. The reference types remain available for future integration.
 
 ## Quick Start
 
@@ -40,18 +50,13 @@ Gallery features: ~100 component demos, theme toggle (Light/Dark), interactive c
 ```
 acme-ui-kit/
 ├── apps/acme-gallery/       # Interactive component demo
-├── crates/acme-ui/src/      # 132 source files
-│   ├── lib.rs               # Module declarations + re-exports
-│   ├── theme.rs             # Theme, FontSizes, Spacing, ThemeColors
-│   ├── styled.rs            # StyledExt helpers (h_flex, v_flex)
-│   ├── primitives.rs        # Size / Tone enums
-│   ├── chart_base.rs        # Shared chart infrastructure (Scale, Axis, Legend)
-│   ├── states.rs            # Loading/disabled overlays, validation, StateStyling trait
-│   ├── accessibility.rs     # ARIA roles/attributes, reduced-motion, high-contrast
-│   ├── focus.rs             # FocusTrap, RovingTabIndex, keyboard handlers
-│   ├── overlay_manager.rs   # ModalBackdrop, AutoPositioner, ClickOutsideListener
-│   ├── icons.rs             # IconProvider, IconName
-│   └── *.rs                 # One file per component
+├── crates/acme-ui/src/      # 150 Rust source files at this baseline
+│   ├── lib.rs               # Module declarations + public re-exports
+│   ├── foundations/         # Theme, primitives, styled helpers, base components
+│   ├── infra/               # States, focus, accessibility reference types
+│   ├── charts/chart_base/   # Scale, axis, legend, palette
+│   └── inputs/, layout/, data/, desktop/, media/, overlay/, charts/
+├── crates/acme-ui/tests/    # Display-independent public API regression tests
 ├── docs/                    # Architecture, Design System, API, Roadmap
 ├── scripts/                 # Windows / Unix helpers
 ├── AGENTS.md                # Agent workflow rules (incl. git push)
@@ -90,6 +95,19 @@ cargo fmt --all -- --check
 cargo check --workspace --all-targets
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
+```
+
+CI and local commands use `rust-toolchain.toml` as the single toolchain source.
+The project retains nightly; CI logs the selected compiler and Cargo versions.
+The tests in `crates/acme-ui/tests/pure_logic.rs` do not open a window or require
+a display server. Full workspace commands also build Gallery's GPUI platform
+backend and require native build/link packages.
+
+For Ubuntu/Debian builds (including the enabled X11 backend):
+
+```sh
+sudo apt-get install -y pkg-config libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libx11-xcb-dev libfontconfig1-dev libasound2-dev
+cargo test -p acme-ui --test pure_logic
 ```
 
 ## GPUI Upgrades

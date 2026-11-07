@@ -17,9 +17,17 @@
 | **V9 DataGrid** | DataGrid（Entity 架構，支援排序/篩選/編輯/鍵盤導航/CSV 匯出） | ✅ |
 | **V10 內容與媒體** | RichText、HtmlView、LineNumbers、DiffViewer、MarkdownPreview、DocumentOutline、FindReplace、LogViewer、HexViewer、ImageView、AvatarGroup、Carousel、Lightbox、Canvas、ZoomView、PanView、ThumbnailStrip、Cropper、AnnotationLayer | ✅ |
 | **P2 圖表** | PieChart、DonutChart、Gauge、Sparkline、LineChart、AreaChart、ScatterChart、Histogram、Heatmap、CandlestickChart、StreamingChart + 共用 chart_base（Scale、Axis、Legend、ChartColors） | ✅ |
-| **P2 基礎設施** | Component States（載入/停用遮罩、驗證邊框）、Accessibility（40+ ARIA 角色、17 個屬性）、Focus（FocusTrap、RovingTabIndex、鍵盤處理器）、Overlay Manager（ModalBackdrop、AutoPositioner、ClickOutsideListener、FocusRestore） | ✅ |
+| **P2 基礎設施** | Component States（載入/停用遮罩、驗證邊框）、Accessibility 參考型別（尚未連接元件或原生無障礙樹）、Focus（FocusTrap、RovingTabIndex、鍵盤處理器）、Overlay Manager（ModalBackdrop、AutoPositioner、ClickOutsideListener、FocusRestore） | ✅ |
 
-**總計**：132 個原始檔，約 16500+ 行程式碼，零警告編譯。
+**原始碼結構**：此基準版本的 `crates/acme-ui/src` 有 150 個 Rust 檔案，不含 Gallery 與測試。這是實作項目清單，不代表已通過正式產品或無障礙驗收。
+
+## 無障礙現況
+
+`AriaRole` 與 `AriaAttrs` 是公開的參考型別與 builder，目前元件沒有使用它們，
+也尚未連接 GPUI 的原生無障礙樹。`aria_label` 只組合字串；`sr_only_label`
+只裁切畫面內容，兩者都不能證明已支援螢幕閱讀器。減少動畫與高對比偏好函式
+目前固定回傳 `false`，不會讀取作業系統設定。螢幕閱讀器操作與完整鍵盤操作
+尚未驗證。這些參考型別會保留，供後續整合使用。
 
 ## 快速開始
 
@@ -40,18 +48,13 @@ Gallery 功能：約 100 個元件展示、切換 Light/Dark 主題、所有元�
 ```
 acme-ui-kit/
 ├── apps/acme-gallery/       # 互動式元件展示
-├── crates/acme-ui/src/      # 132 個原始檔
-│   ├── lib.rs               # 模組宣告 + re-export
-│   ├── theme.rs             # Theme、FontSizes、Spacing、ThemeColors
-│   ├── styled.rs            # StyledExt 輔助函式（h_flex、v_flex）
-│   ├── primitives.rs        # Size / Tone 列舉
-│   ├── chart_base.rs        # 共用圖表基礎設施（Scale、Axis、Legend）
-│   ├── states.rs            # 載入/停用遮罩、驗證、StateStyling trait
-│   ├── accessibility.rs     # ARIA 角色/屬性、減少動畫、高對比度
-│   ├── focus.rs             # FocusTrap、RovingTabIndex、鍵盤處理器
-│   ├── overlay_manager.rs   # ModalBackdrop、AutoPositioner、ClickOutsideListener
-│   ├── icons.rs             # IconProvider、IconName
-│   └── *.rs                 # 每元件一個檔案
+├── crates/acme-ui/src/      # 此基準版本有 150 個 Rust 原始檔
+│   ├── lib.rs               # 模組宣告與公開 re-export
+│   ├── foundations/         # Theme、primitives、樣式工具與基礎元件
+│   ├── infra/               # 狀態、焦點與無障礙參考型別
+│   ├── charts/chart_base/   # 比例尺、座標軸、圖例與調色盤
+│   └── inputs/、layout/、data/、desktop/、media/、overlay/、charts/
+├── crates/acme-ui/tests/    # 不需顯示伺服器的公開 API 回歸測試
 ├── docs/                    # 架構、設計系統、API、路線圖
 ├── scripts/                 # Windows / Unix 輔助腳本
 ├── AGENTS.md                # Agent 工作流程規則（含 git push）
@@ -88,6 +91,18 @@ cargo fmt --all -- --check
 cargo check --workspace --all-targets
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
+```
+
+CI 與本機指令都以 `rust-toolchain.toml` 為唯一工具鏈來源，保留專案現有的
+nightly 設定，並在 CI 印出實際使用的編譯器與 Cargo 版本。
+`crates/acme-ui/tests/pure_logic.rs` 不會開啟視窗，也不需要顯示伺服器，
+完整 workspace 指令也會建置 Gallery 的 GPUI 平台後端，仍需安裝原生建置與連結套件。
+
+Ubuntu／Debian 建置需要以下套件（包含已啟用的 X11 後端）：
+
+```sh
+sudo apt-get install -y pkg-config libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libx11-xcb-dev libfontconfig1-dev libasound2-dev
+cargo test -p acme-ui --test pure_logic
 ```
 
 ## GPUI 升級
