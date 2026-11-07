@@ -202,16 +202,12 @@ impl Render for FileManager {
                             .child("Explorer"),
                     )
                     .child(
-                        div()
-                            .flex_1()
-                            .px_2()
-                            .py_2()
-                            .child(
-                                Tree::new("folder-tree")
-                                    .nodes(self.folder_tree.clone())
-                                    .expanded(&self.expanded)
-                                    .on_click(tree_on_click),
-                            ),
+                        div().flex_1().px_2().py_2().child(
+                            Tree::new("folder-tree")
+                                .nodes(self.folder_tree.clone())
+                                .expanded(&self.expanded)
+                                .on_click(tree_on_click),
+                        ),
                     )
                     .child(
                         div()
@@ -268,20 +264,13 @@ impl Render for FileManager {
                                     .text_color(c.muted_foreground)
                                     .child("Preview"),
                             )
-                            .child(
-                                div()
-                                    .flex_1()
-                                    .px_2()
-                                    .flex()
-                                    .items_center()
-                                    .child({
-                                        let mut strip = ThumbnailStrip::new("preview-strip");
-                                        for t in &self.thumbnails {
-                                            strip = strip.item(t.clone());
-                                        }
-                                        strip.selected(self.selected_thumbnail.unwrap_or(0))
-                                    }),
-                            ),
+                            .child(div().flex_1().px_2().flex().items_center().child({
+                                let mut strip = ThumbnailStrip::new("preview-strip");
+                                for t in &self.thumbnails {
+                                    strip = strip.item(t.clone());
+                                }
+                                strip.selected(self.selected_thumbnail.unwrap_or(0))
+                            })),
                     )
                     // Drop zone
                     .child(

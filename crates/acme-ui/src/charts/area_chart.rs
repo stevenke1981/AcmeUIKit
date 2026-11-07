@@ -117,77 +117,75 @@ impl RenderOnce for AreaChart {
                 }))
             })
             // Render each series
-            .children(self.series.into_iter().map(
-                move |series| {
-                    if !series.visible || series.data.len() < 2 {
-                        return div().into_any_element();
-                    }
+            .children(self.series.into_iter().map(move |series| {
+                if !series.visible || series.data.len() < 2 {
+                    return div().into_any_element();
+                }
 
-                    let color = series.color;
-                    let len = series.data.len();
-                    let step_x = h * 0.9 / (len - 1) as f32;
-                    let offset_x = h * 0.05;
+                let color = series.color;
+                let len = series.data.len();
+                let step_x = h * 0.9 / (len - 1) as f32;
+                let offset_x = h * 0.05;
 
-                    let points: Vec<(f32, f32)> = series
-                        .data
-                        .iter()
-                        .enumerate()
-                        .map(|(i, &val)| {
-                            let x = offset_x + i as f32 * step_x;
-                            let y = h * 0.9 * (1.0 - val as f32 / global_max);
-                            (x, y)
-                        })
-                        .collect();
+                let points: Vec<(f32, f32)> = series
+                    .data
+                    .iter()
+                    .enumerate()
+                    .map(|(i, &val)| {
+                        let x = offset_x + i as f32 * step_x;
+                        let y = h * 0.9 * (1.0 - val as f32 / global_max);
+                        (x, y)
+                    })
+                    .collect();
 
-                    let mut els: Vec<gpui::AnyElement> = Vec::new();
+                let mut els: Vec<gpui::AnyElement> = Vec::new();
 
-                    // Connecting segments between consecutive points
-                    for i in 1..points.len() {
-                        let (x1, y1) = points[i - 1];
-                        let (x2, y2) = points[i];
-                        let mid_y = (y1 + y2) / 2.0;
-                        els.push(
-                            div()
-                                .absolute()
-                                .left(px(x1))
-                                .top(px(mid_y - 1.))
-                                .w(px(x2 - x1))
-                                .h(px(2.))
-                                .bg(color)
-                                .into_any_element(),
-                        );
-                    }
-
-                    // Filled area — a semi-transparent rectangle covering the plot region
+                // Connecting segments between consecutive points
+                for i in 1..points.len() {
+                    let (x1, y1) = points[i - 1];
+                    let (x2, y2) = points[i];
+                    let mid_y = (y1 + y2) / 2.0;
                     els.push(
                         div()
                             .absolute()
-                            .left(px(offset_x))
-                            .bottom(px(0.))
-                            .w(px((max_len - 1) as f32 * step_x))
-                            .h(px(h * 0.9))
-                            .bg(color.alpha(fill_alpha))
-                            .rounded(px(2.))
+                            .left(px(x1))
+                            .top(px(mid_y - 1.))
+                            .w(px(x2 - x1))
+                            .h(px(2.))
+                            .bg(color)
                             .into_any_element(),
                     );
+                }
 
-                    // Data point dots
-                    for &(x, y) in &points {
-                        els.push(
-                            div()
-                                .absolute()
-                                .left(px(x - 3.))
-                                .top(px(y - 3.))
-                                .size(px(6.))
-                                .rounded_full()
-                                .bg(color)
-                                .into_any_element(),
-                        );
-                    }
+                // Filled area — a semi-transparent rectangle covering the plot region
+                els.push(
+                    div()
+                        .absolute()
+                        .left(px(offset_x))
+                        .bottom(px(0.))
+                        .w(px((max_len - 1) as f32 * step_x))
+                        .h(px(h * 0.9))
+                        .bg(color.alpha(fill_alpha))
+                        .rounded(px(2.))
+                        .into_any_element(),
+                );
 
-                    div().children(els).into_any_element()
-                },
-            ))
+                // Data point dots
+                for &(x, y) in &points {
+                    els.push(
+                        div()
+                            .absolute()
+                            .left(px(x - 3.))
+                            .top(px(y - 3.))
+                            .size(px(6.))
+                            .rounded_full()
+                            .bg(color)
+                            .into_any_element(),
+                    );
+                }
+
+                div().children(els).into_any_element()
+            }))
             .into_any_element()
     }
 }

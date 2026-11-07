@@ -72,30 +72,22 @@ impl RenderOnce for Cropper {
                     .justify_center()
                     .bg(c.muted)
                     .child(
-                        div()
-                            .v_flex()
-                            .items_center()
-                            .child(
-                                // Crop overlay frame: centered box with distinct border
-                                div()
-                                    .w(px(200.))
-                                    .h(px(150.))
-                                    .border_1()
-                                    .border_color(c.primary)
-                                    .rounded(px(2.))
-                                    .flex()
-                                    .items_center()
-                                    .justify_center()
-                                    .text_color(c.primary_foreground)
-                                    .text_size(font_sizes.caption)
-                                    .bg(gpui::hsla(
-                                        0.,
-                                        0.,
-                                        1.,
-                                        0.1,
-                                    ))
-                                    .child(Icon::new(IconName::Folder).with_size(px(20.))),
-                            ),
+                        div().v_flex().items_center().child(
+                            // Crop overlay frame: centered box with distinct border
+                            div()
+                                .w(px(200.))
+                                .h(px(150.))
+                                .border_1()
+                                .border_color(c.primary)
+                                .rounded(px(2.))
+                                .flex()
+                                .items_center()
+                                .justify_center()
+                                .text_color(c.primary_foreground)
+                                .text_size(font_sizes.caption)
+                                .bg(gpui::hsla(0., 0., 1., 0.1))
+                                .child(Icon::new(IconName::Folder).with_size(px(20.))),
+                        ),
                     ),
             )
             // Aspect ratio label and info

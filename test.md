@@ -9,6 +9,19 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
 
+## Headless logic regression tests
+
+```bash
+cargo test -p acme-ui --test pure_logic
+```
+
+These integration tests cover HSL conversion, theme token invariants, compatibility
+between Size and ControlSizes, typography/spacing/radius/motion scales, and string
+helpers. They do not initialize GPUI or open a window. Full workspace checks also build
+Gallery's GPUI platform backend, which requires the native development packages
+listed in README. Passing these
+tests does not validate rendering, assistive technology, or OS preference detection.
+
 ## Gallery Smoke Test
 
 1. 啟動 `cargo run -p acme-gallery`。
