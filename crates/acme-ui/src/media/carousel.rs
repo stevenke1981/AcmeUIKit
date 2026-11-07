@@ -85,21 +85,16 @@ impl RenderOnce for Carousel {
                     .items_center()
                     .justify_center()
                     .when_some(slide, |this, s| {
-                        this.bg(s.color)
-                            .child(
-                                div()
-                                    .text_size(font_sizes.body)
-                                    .text_color(gpui::white())
-                                    .child(s.label.clone()),
-                            )
+                        this.bg(s.color).child(
+                            div()
+                                .text_size(font_sizes.body)
+                                .text_color(gpui::white())
+                                .child(s.label.clone()),
+                        )
                     })
                     .when(slide.is_none(), |this| {
                         this.bg(c.muted)
-                            .child(
-                                div()
-                                    .text_color(c.muted_foreground)
-                                    .child("No slides"),
-                            )
+                            .child(div().text_color(c.muted_foreground).child("No slides"))
                     }),
             )
             // Navigation row (arrows + dots)
@@ -125,9 +120,10 @@ impl RenderOnce for Carousel {
                             .children((0..slide_count).map(move |i| {
                                 let is_active = i == current;
                                 div()
-                                    .id(ElementId::Name(
-                                        SharedString::from(format!("carousel-dot-{}", i)),
-                                    ))
+                                    .id(ElementId::Name(SharedString::from(format!(
+                                        "carousel-dot-{}",
+                                        i
+                                    ))))
                                     .w(px(8.))
                                     .h(px(8.))
                                     .rounded_full()

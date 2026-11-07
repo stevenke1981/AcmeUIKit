@@ -183,27 +183,25 @@ impl RenderOnce for ScatterChart {
                 }))
             })
             // Data points grouped by series
-            .children(self.series.into_iter().map(
-                |series| {
-                    let color = series.color;
-                    div()
-                        .children(series.points.into_iter().map(|pt| {
-                            let px_x = pad + (pt.x / max_x) * plot_w;
-                            let px_y = pad + plot_h * (1.0 - pt.y / max_y);
-                            div()
-                                .absolute()
-                                .left(px(px_x - 4.))
-                                .top(px(px_y - 4.))
-                                .size(px(8.))
-                                .rounded_full()
-                                .bg(color)
-                                .border_2()
-                                .border_color(c.background)
-                                .into_any_element()
-                        }))
-                        .into_any_element()
-                },
-            ))
+            .children(self.series.into_iter().map(|series| {
+                let color = series.color;
+                div()
+                    .children(series.points.into_iter().map(|pt| {
+                        let px_x = pad + (pt.x / max_x) * plot_w;
+                        let px_y = pad + plot_h * (1.0 - pt.y / max_y);
+                        div()
+                            .absolute()
+                            .left(px(px_x - 4.))
+                            .top(px(px_y - 4.))
+                            .size(px(8.))
+                            .rounded_full()
+                            .bg(color)
+                            .border_2()
+                            .border_color(c.background)
+                            .into_any_element()
+                    }))
+                    .into_any_element()
+            }))
             .into_any_element()
     }
 }

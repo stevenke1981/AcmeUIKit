@@ -106,13 +106,7 @@ impl RenderOnce for Slider {
                     .rounded(px(4.))
                     .bg(c.muted)
                     .overflow_hidden()
-                    .child(
-                        div()
-                            .h_full()
-                            .w(px(fill_w))
-                            .bg(c.primary)
-                            .rounded(px(4.)),
-                    )
+                    .child(div().h_full().w(px(fill_w)).bg(c.primary).rounded(px(4.)))
                     .child(
                         // Thumb indicator
                         div()

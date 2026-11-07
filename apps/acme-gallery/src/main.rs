@@ -847,15 +847,19 @@ impl Render for Gallery {
             .child(Separator::new())
             .child(div().child("Select (V2)"))
             .child(
-                div().flex().gap_2().items_center()
+                div()
+                    .flex()
+                    .gap_2()
+                    .items_center()
                     .child(
                         Button::new("toggle-select")
-                            .small().secondary()
+                            .small()
+                            .secondary()
                             .label(if self.select_open { "Close" } else { "Open" })
                             .on_click(cx.listener(|this, _, _, cx| {
                                 this.select_open = !this.select_open;
                                 cx.notify();
-                            }))
+                            })),
                     )
                     .child(
                         Select::new("demo-select")
@@ -878,8 +882,8 @@ impl Render for Gallery {
                                         });
                                     }
                                 }
-                            })
-                    )
+                            }),
+                    ),
             )
             // Combobox row
             .child(Separator::new())
@@ -902,33 +906,33 @@ impl Render for Gallery {
                                 });
                             }
                         }
-                    })
+                    }),
             )
             // Sidebar + Resizable row
             .child(Separator::new())
             .child(div().child("Sidebar (V3) + Resizable (V3)"))
             .child(
-                div().h(px(200.)).flex().w_full()
+                div()
+                    .h(px(200.))
+                    .flex()
+                    .w_full()
                     .child(
                         Sidebar::new("demo-sidebar")
                             .title("Navigation")
                             .width(px(160.))
                             .child(div().child("Item 1"))
                             .child(div().child("Item 2"))
-                            .child(div().child("Item 3"))
+                            .child(div().child("Item 3")),
                     )
-                    .child(
-                        div().flex_1().bg(c.surface)
-                            .child(" Main Content ")
-                    )
+                    .child(div().flex_1().bg(c.surface).child(" Main Content ")),
             )
             .child(Separator::new())
+            .child(div().child("Resizable (V3) — drag the divider:"))
             .child(
-                div().child("Resizable (V3) — drag the divider:")
-            )
-            .child(
-                div().h(px(100.)).w_full()
-                    .child(self.resizable_entity.clone())
+                div()
+                    .h(px(100.))
+                    .w_full()
+                    .child(self.resizable_entity.clone()),
             );
 
         // ── V3 Tree + Form + Table card ──
@@ -948,31 +952,32 @@ impl Render for Gallery {
                     .text_size(px(11.))
                     .text_color(c.muted_foreground),
             )
-            .child(Tree::new("demo-tree")
-                .nodes(vec![
-                    TreeNode::new("src", 0).children(vec![
-                        TreeNode::new("main.rs", 1),
-                        TreeNode::new("lib.rs", 2),
-                        TreeNode::new("components", 3).children(vec![
-                            TreeNode::new("button.rs", 4),
-                            TreeNode::new("card.rs", 5),
+            .child(
+                Tree::new("demo-tree")
+                    .nodes(vec![
+                        TreeNode::new("src", 0).children(vec![
+                            TreeNode::new("main.rs", 1),
+                            TreeNode::new("lib.rs", 2),
+                            TreeNode::new("components", 3).children(vec![
+                                TreeNode::new("button.rs", 4),
+                                TreeNode::new("card.rs", 5),
+                            ]),
                         ]),
-                    ]),
-                    TreeNode::new("Cargo.toml", 6),
-                    TreeNode::new("README.md", 7),
-                ])
-                .expanded(&[0, 3])
-                .on_click({
-                    let handle = cx.entity().downgrade();
-                    move |index, _event, _window, cx| {
-                        if let Some(handle) = handle.upgrade() {
-                            handle.update(cx, |this, cx| {
-                                this.tree_selected = Some(index);
-                                cx.notify();
-                            });
+                        TreeNode::new("Cargo.toml", 6),
+                        TreeNode::new("README.md", 7),
+                    ])
+                    .expanded(&[0, 3])
+                    .on_click({
+                        let handle = cx.entity().downgrade();
+                        move |index, _event, _window, cx| {
+                            if let Some(handle) = handle.upgrade() {
+                                handle.update(cx, |this, cx| {
+                                    this.tree_selected = Some(index);
+                                    cx.notify();
+                                });
+                            }
                         }
-                    }
-                })
+                    }),
             )
             // Form
             .child(Separator::new())
@@ -1017,7 +1022,11 @@ impl Render for Gallery {
                     .rows(vec![
                         vec!["Alice".into(), "Engineer".into(), "alice@acme.dev".into()],
                         vec!["Bob".into(), "Designer".into(), "bob@acme.dev".into()],
-                        vec!["Charlie".into(), "Manager".into(), "charlie@acme.dev".into()],
+                        vec![
+                            "Charlie".into(),
+                            "Manager".into(),
+                            "charlie@acme.dev".into(),
+                        ],
                     ])
                     .sort_key(self.table_sort_key.clone())
                     .sort_direction(self.table_sort_dir)
@@ -1143,21 +1152,25 @@ impl Render for Gallery {
             .child(Separator::new())
             .child(div().child("Alert (V5):"))
             .child(
-                div().v_flex().gap_2()
+                div()
+                    .v_flex()
+                    .gap_2()
                     .child(Alert::new("Information message").tone(Tone::Primary))
                     .child(Alert::new("Operation successful!").tone(Tone::Success))
                     .child(Alert::new("Warning: disk space low").tone(Tone::Warning))
-                    .child(Alert::new("Error: connection failed").tone(Tone::Danger))
+                    .child(Alert::new("Error: connection failed").tone(Tone::Danger)),
             )
             // Tag
             .child(Separator::new())
             .child(div().child("Tag (V5):"))
             .child(
-                div().h_flex().gap_2()
+                div()
+                    .h_flex()
+                    .gap_2()
                     .child(Tag::new("Rust"))
                     .child(Tag::new("TypeScript").color(hsl(210., 0.73, 0.48)))
                     .child(Tag::new("Python").color(hsl(120., 0.55, 0.45)))
-                    .child(Tag::new("Filter").removable(true))
+                    .child(Tag::new("Filter").removable(true)),
             )
             // Slider
             .child(Separator::new())
@@ -1167,11 +1180,14 @@ impl Render for Gallery {
             .child(Separator::new())
             .child(div().child("Avatar (V5):"))
             .child(
-                div().h_flex().gap_3().items_center()
+                div()
+                    .h_flex()
+                    .gap_3()
+                    .items_center()
                     .child(Avatar::new("Alice Wang"))
                     .child(Avatar::new("Bob Chen").size(Size::Small))
                     .child(Avatar::new("Charlie Li").size(Size::Large))
-                    .child(Avatar::new("Diana"))
+                    .child(Avatar::new("Diana")),
             )
             // Breadcrumb
             .child(Separator::new())
@@ -1180,7 +1196,7 @@ impl Render for Gallery {
                 Breadcrumb::new()
                     .item("Home")
                     .item("Products")
-                    .item("Widgets")
+                    .item("Widgets"),
             )
             // Stepper
             .child(Separator::new())
@@ -1191,7 +1207,7 @@ impl Render for Gallery {
                     .step("Shipping")
                     .step("Payment")
                     .step("Confirm")
-                    .active_step(2)
+                    .active_step(2),
             )
             // Toolbar
             .child(Separator::new())
@@ -1199,9 +1215,19 @@ impl Render for Gallery {
             .child(
                 Toolbar::new()
                     .child(Button::new("tb-save").extra_small().primary().label("Save"))
-                    .child(Button::new("tb-edit").extra_small().secondary().label("Edit"))
+                    .child(
+                        Button::new("tb-edit")
+                            .extra_small()
+                            .secondary()
+                            .label("Edit"),
+                    )
                     .separator()
-                    .child(Button::new("tb-delete").extra_small().danger().label("Delete"))
+                    .child(
+                        Button::new("tb-delete")
+                            .extra_small()
+                            .danger()
+                            .label("Delete"),
+                    ),
             )
             // List
             .child(Separator::new())
@@ -1209,18 +1235,28 @@ impl Render for Gallery {
             .child(
                 List::new("demo-list")
                     .item(ListItem::new("Apple").description("A sweet red fruit"))
-                    .item(ListItem::new("Banana").description("A yellow curved fruit").selected(true))
+                    .item(
+                        ListItem::new("Banana")
+                            .description("A yellow curved fruit")
+                            .selected(true),
+                    )
                     .item(ListItem::new("Cherry").description("A small stone fruit"))
-                    .item(ListItem::new("Grapefruit").disabled(true).description("Citrus fruit"))
+                    .item(
+                        ListItem::new("Grapefruit")
+                            .disabled(true)
+                            .description("Citrus fruit"),
+                    ),
             )
             // Kbd
             .child(Separator::new())
             .child(div().child("Kbd / Shortcut (V5):"))
             .child(
-                div().h_flex().gap_2()
+                div()
+                    .h_flex()
+                    .gap_2()
                     .child(Kbd::new("⌘K"))
                     .child(Kbd::new("⌘⇧P"))
-                    .child(Kbd::new("Ctrl+S"))
+                    .child(Kbd::new("Ctrl+S")),
             );
 
         // ── V6 More Components card ──
@@ -1801,7 +1837,9 @@ impl Render for Gallery {
                         div()
                             .text_size(px(10.))
                             .text_color(c.muted_foreground)
-                            .child("escape_close_handler() / arrow_key_nav_handler() for on_key_down"),
+                            .child(
+                                "escape_close_handler() / arrow_key_nav_handler() for on_key_down",
+                            ),
                     ),
             )
             // DefaultCancelButtons
@@ -1812,14 +1850,21 @@ impl Render for Gallery {
                     .flex()
                     .gap_2()
                     .child(Button::new("dflt-ok").extra_small().primary().label("OK"))
-                    .child(Button::new("dflt-cancel").extra_small().secondary().label("Cancel")),
+                    .child(
+                        Button::new("dflt-cancel")
+                            .extra_small()
+                            .secondary()
+                            .label("Cancel"),
+                    ),
             );
 
         // ── P2 Infrastructure: Overlay card ──
 
         let overlay_card = Card::new()
             .title("P2 Overlay")
-            .description("ModalBackdrop, OverlayDepth, AutoPositioner, ClickOutsideListener, FocusRestore")
+            .description(
+                "ModalBackdrop, OverlayDepth, AutoPositioner, ClickOutsideListener, FocusRestore",
+            )
             // ModalBackdrop
             .child(Separator::new())
             .child(div().child("ModalBackdrop:"))
@@ -1844,7 +1889,10 @@ impl Render for Gallery {
                     .bg(c.surface)
                     .rounded(cx.theme().radius)
                     .child(
-                        div().p_2().text_size(px(11.)).text_color(c.muted_foreground)
+                        div()
+                            .p_2()
+                            .text_size(px(11.))
+                            .text_color(c.muted_foreground)
                             .child(if self.modal_backdrop_open {
                                 "Backdrop visible"
                             } else {
@@ -1864,7 +1912,9 @@ impl Render for Gallery {
                     .gap_1()
                     .text_size(px(11.))
                     .text_color(c.muted_foreground)
-                    .child("Popover=100  Drawer=200  Dialog=300  Modal=400  Toast=500  DragDrop=600"),
+                    .child(
+                        "Popover=100  Drawer=200  Dialog=300  Modal=400  Toast=500  DragDrop=600",
+                    ),
             )
             // AutoPositioner
             .child(Separator::new())
@@ -1927,16 +1977,15 @@ impl Render for Gallery {
             .child(Separator::new())
             .child(div().child("ClickOutsideListener:"))
             .child(
-                ClickOutsideListener::new("demo-outside")
-                    .child(
-                        div()
-                            .bg(c.surface)
-                            .rounded(cx.theme().radius)
-                            .p_3()
-                            .text_size(px(11.))
-                            .text_color(c.muted_foreground)
-                            .child("Click outside this box"),
-                    ),
+                ClickOutsideListener::new("demo-outside").child(
+                    div()
+                        .bg(c.surface)
+                        .rounded(cx.theme().radius)
+                        .p_3()
+                        .text_size(px(11.))
+                        .text_color(c.muted_foreground)
+                        .child("Click outside this box"),
+                ),
             )
             // FocusRestore
             .child(Separator::new())

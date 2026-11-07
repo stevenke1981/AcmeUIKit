@@ -124,77 +124,88 @@ impl Render for DesktopEditor {
             .child(
                 AppMenuBar::new()
                     .add("File", &["New", "Open", "Save", "Save As", "—", "Exit"])
-                    .add("Edit", &["Undo", "Redo", "—", "Cut", "Copy", "Paste", "Delete"])
-                    .add("View", &["Command Palette", "Explorer", "Properties", "—", "Toggle Fullscreen"])
+                    .add(
+                        "Edit",
+                        &["Undo", "Redo", "—", "Cut", "Copy", "Paste", "Delete"],
+                    )
+                    .add(
+                        "View",
+                        &[
+                            "Command Palette",
+                            "Explorer",
+                            "Properties",
+                            "—",
+                            "Toggle Fullscreen",
+                        ],
+                    )
                     .add("Help", &["About", "Documentation", "Check for Updates"])
                     .on_select(on_menu_select),
             )
             // ── Dock (Main Content Area) ──
             .child(
-                div()
-                    .flex_1()
-                    .child(
-                        Dock::new("editor-dock")
-                            .panels(vec![
-                                DockPanel::new(DockArea::Left, "Explorer")
-                                    .size(px(250.))
-                                    .visible(self.left_visible),
-                                DockPanel::new(DockArea::Right, "Properties")
-                                    .size(px(260.))
-                                    .visible(self.right_visible),
-                                DockPanel::new(DockArea::Bottom, "Output")
-                                    .size(px(160.))
-                                    .visible(self.bottom_visible),
-                            ])
-                            // Main center: Canvas
-                            .child(
-                                div()
-                                    .flex_1()
-                                    .flex()
-                                    .items_center()
-                                    .justify_center()
-                                    .bg(c.surface)
-                                    .child(Canvas::new("main-canvas").size(px(640.), px(420.))),
-                            )
-                            // Left panel: file tree / project explorer
-                            .render_left(
-                                div()
-                                    .v_flex()
-                                    .h_full()
-                                    .child(
-                                        div()
-                                            .h(px(28.))
-                                            .flex()
-                                            .items_center()
-                                            .px_3()
-                                            .text_size(px(11.))
-                                            .text_color(c.muted_foreground)
-                                            .child("PROJECT"),
-                                    )
-                                    .child(
-                                        div()
-                                            .flex_1()
-                                            .px_3()
-                                            .py_2()
-                                            .v_flex()
-                                            .gap_1()
-                                            .text_size(px(12.))
-                                            .children(
-                                                [
-                                                    "src/",
-                                                    "  main.rs",
-                                                    "  lib.rs",
-                                                    "  components/",
-                                                    "    button.rs",
-                                                    "    input.rs",
-                                                    "  utils/",
-                                                    "    helpers.rs",
-                                                    "tests/",
-                                                    "Cargo.toml",
-                                                    "README.md",
-                                                ]
-                                                .into_iter()
-                                                .map(|line| {
+                div().flex_1().child(
+                    Dock::new("editor-dock")
+                        .panels(vec![
+                            DockPanel::new(DockArea::Left, "Explorer")
+                                .size(px(250.))
+                                .visible(self.left_visible),
+                            DockPanel::new(DockArea::Right, "Properties")
+                                .size(px(260.))
+                                .visible(self.right_visible),
+                            DockPanel::new(DockArea::Bottom, "Output")
+                                .size(px(160.))
+                                .visible(self.bottom_visible),
+                        ])
+                        // Main center: Canvas
+                        .child(
+                            div()
+                                .flex_1()
+                                .flex()
+                                .items_center()
+                                .justify_center()
+                                .bg(c.surface)
+                                .child(Canvas::new("main-canvas").size(px(640.), px(420.))),
+                        )
+                        // Left panel: file tree / project explorer
+                        .render_left(
+                            div()
+                                .v_flex()
+                                .h_full()
+                                .child(
+                                    div()
+                                        .h(px(28.))
+                                        .flex()
+                                        .items_center()
+                                        .px_3()
+                                        .text_size(px(11.))
+                                        .text_color(c.muted_foreground)
+                                        .child("PROJECT"),
+                                )
+                                .child(
+                                    div()
+                                        .flex_1()
+                                        .px_3()
+                                        .py_2()
+                                        .v_flex()
+                                        .gap_1()
+                                        .text_size(px(12.))
+                                        .children(
+                                            [
+                                                "src/",
+                                                "  main.rs",
+                                                "  lib.rs",
+                                                "  components/",
+                                                "    button.rs",
+                                                "    input.rs",
+                                                "  utils/",
+                                                "    helpers.rs",
+                                                "tests/",
+                                                "Cargo.toml",
+                                                "README.md",
+                                            ]
+                                            .into_iter()
+                                            .map(
+                                                |line| {
                                                     let is_dir = line.ends_with('/');
                                                     div()
                                                         .h(px(24.))
@@ -208,85 +219,88 @@ impl Render for DesktopEditor {
                                                             c.muted_foreground
                                                         })
                                                         .child(line.trim_end_matches('/'))
-                                                }),
+                                                },
                                             ),
-                                    )
-                                    .child(
-                                        div()
-                                            .h(px(24.))
-                                            .flex()
-                                            .items_center()
-                                            .px_3()
-                                            .border_t_1()
-                                            .border_color(c.border)
-                                            .text_size(px(10.))
-                                            .text_color(c.muted_foreground)
-                                            .child("12 files"),
-                                    ),
-                            )
-                            // Right panel: PropertyGrid
-                            .render_right(
-                                div()
-                                    .v_flex()
-                                    .h_full()
-                                    .child(
-                                        div()
-                                            .h(px(28.))
-                                            .flex()
-                                            .items_center()
-                                            .px_3()
-                                            .text_size(px(11.))
-                                            .text_color(c.muted_foreground)
-                                            .child("PROPERTIES"),
-                                    )
-                                    .child(
-                                        div()
-                                            .flex_1()
-                                            .px_2()
-                                            .py_2()
-                                            .child({
-                                                let mut pg = PropertyGrid::new();
-                                                for (k, v) in &self.properties {
-                                                    pg = pg.property(k.clone(), v.clone());
-                                                }
-                                                pg
-                                            }),
-                                    ),
-                            )
-                            // Bottom panel: output / terminal
-                            .render_bottom(
-                                div()
-                                    .v_flex()
-                                    .h_full()
-                                    .child(
-                                        div()
-                                            .h(px(28.))
-                                            .flex()
-                                            .items_center()
-                                            .px_3()
-                                            .gap_3()
-                                            .border_b_1()
-                                            .border_color(c.border)
-                                            .text_size(px(11.))
-                                            .child(div().text_color(c.foreground).child("Output"))
-                                            .child(div().text_color(c.muted_foreground).child("Problems"))
-                                            .child(div().text_color(c.muted_foreground).child("Terminal")),
-                                    )
-                                    .child(
-                                        div()
-                                            .flex_1()
-                                            .p_3()
-                                            .v_flex()
-                                            .gap_1()
-                                            .text_size(px(11.))
-                                            .text_color(c.muted_foreground)
-                                            .child(div().child("$ cargo build"))
-                                            .child(div().child("   Compiling acme-ui v0.1.0"))
-                                            .child(div().child("   Compiling acme-gallery v0.1.0"))
-                                            .child(div().text_color(c.success).child("    Finished dev [unoptimized] in 2.34s")),
-                                    ),
-                            ),
-                    ),
+                                        ),
+                                )
+                                .child(
+                                    div()
+                                        .h(px(24.))
+                                        .flex()
+                                        .items_center()
+                                        .px_3()
+                                        .border_t_1()
+                                        .border_color(c.border)
+                                        .text_size(px(10.))
+                                        .text_color(c.muted_foreground)
+                                        .child("12 files"),
+                                ),
+                        )
+                        // Right panel: PropertyGrid
+                        .render_right(
+                            div()
+                                .v_flex()
+                                .h_full()
+                                .child(
+                                    div()
+                                        .h(px(28.))
+                                        .flex()
+                                        .items_center()
+                                        .px_3()
+                                        .text_size(px(11.))
+                                        .text_color(c.muted_foreground)
+                                        .child("PROPERTIES"),
+                                )
+                                .child(div().flex_1().px_2().py_2().child({
+                                    let mut pg = PropertyGrid::new();
+                                    for (k, v) in &self.properties {
+                                        pg = pg.property(k.clone(), v.clone());
+                                    }
+                                    pg
+                                })),
+                        )
+                        // Bottom panel: output / terminal
+                        .render_bottom(
+                            div()
+                                .v_flex()
+                                .h_full()
+                                .child(
+                                    div()
+                                        .h(px(28.))
+                                        .flex()
+                                        .items_center()
+                                        .px_3()
+                                        .gap_3()
+                                        .border_b_1()
+                                        .border_color(c.border)
+                                        .text_size(px(11.))
+                                        .child(div().text_color(c.foreground).child("Output"))
+                                        .child(
+                                            div().text_color(c.muted_foreground).child("Problems"),
+                                        )
+                                        .child(
+                                            div().text_color(c.muted_foreground).child("Terminal"),
+                                        ),
+                                )
+                                .child(
+                                    div()
+                                        .flex_1()
+                                        .p_3()
+                                        .v_flex()
+                                        .gap_1()
+                                        .text_size(px(11.))
+                                        .text_color(c.muted_foreground)
+                                        .child(div().child("$ cargo build"))
+                                        .child(div().child("   Compiling acme-ui v0.1.0"))
+                                        .child(div().child("   Compiling acme-gallery v0.1.0"))
+                                        .child(
+                                            div()
+                                                .text_color(c.success)
+                                                .child("    Finished dev [unoptimized] in 2.34s"),
+                                        ),
+                                ),
+                        ),
+                ),
             )
             // ── Status Bar ──
             .child(

@@ -113,42 +113,33 @@ impl RenderOnce for PieChart {
                 div()
                     .v_flex()
                     .gap_1()
-                    .children(self.slices.into_iter().enumerate().map(
-                        |(i, slice)| {
-                            let ratio = slice.value / total;
-                            let color =
-                                slice.color.unwrap_or_else(|| ChartColors::get(i));
-                            div()
-                                .h_flex()
-                                .gap_2()
-                                .child(
-                                    div()
-                                        .size(px(10.))
-                                        .rounded(px(2.))
-                                        .bg(color)
-                                        .flex_none(),
-                                )
-                                .child(
-                                    div()
-                                        .text_size(theme.font_sizes.caption)
-                                        .text_color(c.foreground)
-                                        .child(slice.label),
-                                )
-                                .child(
-                                    div()
-                                        .text_size(theme.font_sizes.caption)
-                                        .text_color(c.muted_foreground)
-                                        .child(format!("{:.0}", slice.value)),
-                                )
-                                .child(
-                                    div()
-                                        .text_size(theme.font_sizes.caption)
-                                        .text_color(c.muted_foreground)
-                                        .child(format!("({:.0}%)", ratio * 100.)),
-                                )
-                                .into_any_element()
-                        },
-                    )),
+                    .children(self.slices.into_iter().enumerate().map(|(i, slice)| {
+                        let ratio = slice.value / total;
+                        let color = slice.color.unwrap_or_else(|| ChartColors::get(i));
+                        div()
+                            .h_flex()
+                            .gap_2()
+                            .child(div().size(px(10.)).rounded(px(2.)).bg(color).flex_none())
+                            .child(
+                                div()
+                                    .text_size(theme.font_sizes.caption)
+                                    .text_color(c.foreground)
+                                    .child(slice.label),
+                            )
+                            .child(
+                                div()
+                                    .text_size(theme.font_sizes.caption)
+                                    .text_color(c.muted_foreground)
+                                    .child(format!("{:.0}", slice.value)),
+                            )
+                            .child(
+                                div()
+                                    .text_size(theme.font_sizes.caption)
+                                    .text_color(c.muted_foreground)
+                                    .child(format!("({:.0}%)", ratio * 100.)),
+                            )
+                            .into_any_element()
+                    })),
             )
             .into_any_element()
     }
@@ -248,13 +239,8 @@ impl RenderOnce for DonutChart {
                             .children(self.slices.iter().map(|slice| {
                                 let ratio = slice.value / total;
                                 let w = px((outer * ratio).max(2.0));
-                                let color =
-                                    slice.color.unwrap_or_else(|| ChartColors::get(0));
-                                div()
-                                    .w(w)
-                                    .h(px(outer))
-                                    .bg(color)
-                                    .into_any_element()
+                                let color = slice.color.unwrap_or_else(|| ChartColors::get(0));
+                                div().w(w).h(px(outer)).bg(color).into_any_element()
                             })),
                     )
                     // Hole (inner circle)
