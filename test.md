@@ -55,3 +55,16 @@ tests does not validate rendering, assistive technology, or OS preference detect
 - Render：視窗可開但 layout/顏色錯誤。
 - Interaction：callback 未更新 entity 或未 `cx.notify()`。
 - Platform：只在特定 OS 編譯失敗。
+
+## Roving focus regression and Gallery smoke
+
+`CARGO_NET_OFFLINE=true cargo test -p acme-ui --test roving_focus` runs headless
+navigation regressions without a GPUI window. This does not test event dispatch
+or rendering.
+
+In the live Gallery's SegmentedControl demo, click a segment and use Left/Right
+and Home/End. Check that selection updates immediately, clamps at either end,
+and that clicking the selected segment or pressing a boundary key does not
+change selection. Tab to and away from the control and check its focus border
+in both Light and Dark themes. Up/Down should not change selection. Screen-reader
+semantics are not implemented; this smoke check makes no accessibility claim.

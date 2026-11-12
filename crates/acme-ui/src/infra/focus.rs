@@ -57,21 +57,29 @@ impl RenderOnce for FocusTrap {
 /// A utility for managing roving tabindex within a composite widget.
 #[derive(Clone, Debug)]
 pub struct RovingTabIndex {
+    /// Number of items in the collection.
     pub item_count: usize,
+    /// Current focused index; zero is the empty-collection sentinel.
     pub focused_index: usize,
+    /// Arrow directions accepted for navigation.
     pub orientation: RovingOrientation,
+    /// Whether arrows wrap at collection boundaries.
     pub wrap: bool,
 }
 
 /// Orientation for roving tab index arrow key behavior.
 #[derive(Clone, Debug, PartialEq)]
 pub enum RovingOrientation {
+    /// Left and right arrows.
     Horizontal,
+    /// Up and down arrows.
     Vertical,
+    /// All four arrow directions.
     Both,
 }
 
 impl RovingTabIndex {
+    /// Creates vertical, clamped navigation with the first item focused.
     pub fn new(item_count: usize) -> Self {
         Self {
             item_count,
@@ -81,60 +89,75 @@ impl RovingTabIndex {
         }
     }
 
+    /// Sets which arrow keys navigate the collection.
     pub fn orientation(mut self, orientation: RovingOrientation) -> Self {
         self.orientation = orientation;
         self
     }
 
+    /// Enables wrapping for arrows; Home and End always jump absolutely.
     pub fn wrap(mut self, wrap: bool) -> Self {
         self.wrap = wrap;
         self
     }
 
+    /// Focuses an index clamped to the collection, or zero for an empty collection.
     pub fn focus(mut self, index: usize) -> Self {
         self.focused_index = index.min(self.item_count.saturating_sub(1));
         self
     }
 
-    /// Returns "0" if index is focused, "-1" otherwise.
+    /// Returns "0" for the focused item, or "-1" for other or empty items.
     pub fn tab_index_str(&self, index: usize) -> &'static str {
-        if index == self.focused_index {
+        if self.item_count != 0 && index < self.item_count && index == self.focused_index {
             "0"
         } else {
             "-1"
         }
     }
 
-    /// Handles a key event for arrow-based navigation.
-    /// Returns the new focused index, or `None` if key was not handled.
+    /// Handles GPUI arrow names and legacy `Arrow*` names, case-insensitively.
+    ///
+    /// Home/End jump to the first/last item regardless of wrapping. Modifiers
+    /// do not affect navigation. Returns the target even at a clamped boundary;
+    /// unhandled keys and empty collections return `None` without changing state.
     pub fn handle_key(&mut self, key: &str, _modifiers: &gpui::Modifiers) -> Option<usize> {
-        let is_horiz = self.orientation == RovingOrientation::Horizontal
-            || self.orientation == RovingOrientation::Both;
-        let is_vert = self.orientation == RovingOrientation::Vertical
-            || self.orientation == RovingOrientation::Both;
+        let target = roving_target(self, key)?;
+        self.focused_index = target;
+        Some(target)
+    }
+}
 
-        let delta = match key {
-            _ if is_vert && key == "ArrowDown" => 1,
-            _ if is_vert && key == "ArrowUp" => -1,
-            _ if is_horiz && key == "ArrowRight" => 1,
-            _ if is_horiz && key == "ArrowLeft" => -1,
-            _ if key == "Home" => i32::MIN / 2,
-            _ if key == "End" => i32::MAX / 2,
-            _ => return None,
-        };
-
-        let count = self.item_count.max(1) as i32;
-        let current = self.focused_index as i32;
-        let next = current + delta;
-
-        let new_index = if self.wrap {
-            ((next % count) + count) % count
+fn roving_target(nav: &RovingTabIndex, key: &str) -> Option<usize> {
+    let last = nav.item_count.checked_sub(1)?;
+    let current = nav.focused_index.min(last);
+    let horizontal = nav.orientation != RovingOrientation::Vertical;
+    let vertical = nav.orientation != RovingOrientation::Horizontal;
+    let key = key.to_ascii_lowercase();
+    match key.as_str() {
+        "home" => Some(0),
+        "end" => Some(last),
+        "down" | "arrowdown" if vertical => Some(if current == last {
+            if nav.wrap { 0 } else { last }
         } else {
-            next.clamp(0, count - 1)
-        };
-
-        self.focused_index = new_index as usize;
-        Some(self.focused_index)
+            current + 1
+        }),
+        "right" | "arrowright" if horizontal => Some(if current == last {
+            if nav.wrap { 0 } else { last }
+        } else {
+            current + 1
+        }),
+        "up" | "arrowup" if vertical => Some(if current == 0 {
+            if nav.wrap { last } else { 0 }
+        } else {
+            current - 1
+        }),
+        "left" | "arrowleft" if horizontal => Some(if current == 0 {
+            if nav.wrap { last } else { 0 }
+        } else {
+            current - 1
+        }),
+        _ => None,
     }
 }
 
