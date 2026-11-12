@@ -23,7 +23,7 @@ use acme_ui::{
 };
 use gpui::prelude::FluentBuilder;
 use gpui::{
-    AppContext as _, Context, ElementId, Entity, InteractiveElement as _, IntoElement,
+    AppContext as _, Context, ElementId, Entity, FocusHandle, InteractiveElement as _, IntoElement,
     ParentElement as _, Render, SharedString, StatefulInteractiveElement as _, Styled as _, Window,
     WindowOptions, div, px,
 };
@@ -37,6 +37,8 @@ struct Gallery {
     switch_enabled: bool,
     progress: f32,
     selected_tab: usize,
+    view_mode: usize,
+    view_mode_focus: FocusHandle,
     // V2 state
     text_input_entity: Entity<TextInput>,
     checkbox_checked: bool,
@@ -158,6 +160,8 @@ impl Gallery {
             switch_enabled: true,
             progress: 64.,
             selected_tab: 0,
+            view_mode: 1,
+            view_mode_focus: cx.focus_handle(),
             text_input_entity,
             checkbox_checked: true,
             radio_selected: "option-a",
@@ -1287,7 +1291,24 @@ impl Render for Gallery {
             .child(Separator::new())
             .child(div().child("ToggleButton + SegmentedControl (V6):"))
             .child(div().h_flex().gap_2().child(ToggleButton::new("tb-dark", "Dark").selected(false)).child(ToggleButton::new("tb-light", "Light").selected(true)))
-            .child(SegmentedControl::new("view-mode").items(&["List", "Grid", "Split"]).selected(1))
+            .child(
+                SegmentedControl::new("view-mode")
+                    .items(&["List", "Grid", "Split"])
+                    .selected(self.view_mode)
+                    .focus_handle(self.view_mode_focus.clone())
+                    .on_select({
+                        let handle = cx.entity().downgrade();
+                        move |index, _window, cx| {
+                            if let Some(handle) = handle.upgrade() {
+                                handle.update(cx, |this, cx| {
+                                    this.view_mode = index;
+                                    cx.notify();
+                                });
+                            }
+                        }
+                    }),
+            )
+            .child("Click a segment, then use Left/Right arrows or Home/End (Tab also focuses the control).")
             // Spinner
             .child(Separator::new())
             .child(div().child("Spinner (V6):"))
