@@ -174,3 +174,120 @@ fn disabled_opacity_dims_without_hiding_the_element() {
     let opacity = disabled_opacity();
     assert!(opacity.is_finite() && opacity > 0. && opacity < 1.);
 }
+
+use acme_ui::{Scale, ScaleType, validators};
+
+#[test]
+fn linear_scales_map_and_invert_negative_domains_and_reversed_ranges() {
+    for (start, end) in [(20., 220.), (220., 20.)] {
+        let scale = Scale::linear().domain(-30., -10.).range(start, end);
+        assert_eq!(scale.map(-30.), start);
+        assert_eq!(scale.map(-10.), end);
+        assert_eq!(scale.map(-20.), 120.);
+        for value in [-40., -30., -23.5, -10., 0.] {
+            assert!((scale.invert(scale.map(value)) - value).abs() < 1e-10);
+        }
+    }
+    assert_eq!(Scale::default().map(50.), 0.5);
+    assert_eq!(Scale::linear().band_width(), 0.);
+}
+
+#[test]
+fn degenerate_scales_use_unit_denominators() {
+    let scale = Scale::linear().domain(5., 5.).range(10., 30.);
+    assert_eq!(scale.map(5.), 10.);
+    assert_eq!(scale.map(6.), 30.);
+    assert_eq!(scale.invert(100.), 5.);
+    assert_eq!(scale.ticks(3), vec![5., 5., 5.]);
+    let flat_range = Scale::linear().domain(-10., 10.).range(4., 4.);
+    assert_eq!(flat_range.map(0.), 4.);
+    assert_eq!(flat_range.invert(4.), -10.);
+    assert_eq!(flat_range.invert(5.), 10.);
+}
+
+#[test]
+fn bands_space_categories_and_preserve_range_direction() {
+    let scale = Scale::band(4).range(10., 90.);
+    assert_eq!(scale.band_width(), 20.);
+    assert_eq!(scale.map(0.), 10.);
+    assert_eq!(scale.map(3.), 70.);
+    assert_eq!(scale.invert(50.), 2.);
+    assert_eq!(Scale::band(4).range(90., 10.).band_width(), -20.);
+    let empty = Scale::band(0).range(10., 90.);
+    assert_eq!(empty.band_width(), 0.);
+    assert_eq!(empty.map(0.), 10.);
+    assert_eq!(empty.invert(50.), 0.);
+}
+
+#[test]
+fn ticks_include_endpoints_and_clamp_count_to_two() {
+    let scale = Scale::linear().domain(-8., 4.);
+    assert_eq!(scale.ticks(5), vec![-8., -5., -2., 1., 4.]);
+    for count in [0, 1, 2] {
+        assert_eq!(scale.ticks(count), vec![-8., 4.]);
+    }
+    assert_eq!(Scale::linear().domain(4., -8.).ticks(3), vec![4., -2., -8.]);
+}
+
+#[test]
+fn scale_type_variants_remain_distinct_when_cloned() {
+    let types = [ScaleType::Linear, ScaleType::Band];
+    let cloned = types.clone();
+    assert_eq!(cloned, types);
+    assert_ne!(types[0], types[1]);
+}
+
+#[test]
+fn required_validation_trims_whitespace_without_rejecting_zero() {
+    let rule = validators::required();
+    for value in ["", " \t\n", "\u{3000}"] {
+        assert_eq!(rule(value).as_deref(), Some("This field is required"));
+    }
+    for value in ["0", " 儲存 "] {
+        assert!(rule(value).is_none());
+    }
+}
+
+#[test]
+fn length_validation_counts_characters_and_includes_boundaries() {
+    let min = validators::min_length(3);
+    let max = validators::max_length(3);
+    assert_eq!(min("ab").as_deref(), Some("Must be at least 3 characters"));
+    assert!(min("abc").is_none());
+    assert!(max("abc").is_none());
+    assert_eq!(max("abcd").as_deref(), Some("Must be at most 3 characters"));
+    // Multi-byte characters count once, matching the "characters" wording of the messages.
+    assert!(validators::min_length(1)("貓").is_none());
+    assert!(validators::max_length(1)("貓").is_none());
+    assert!(validators::min_length(3)("貓貓貓").is_none());
+    assert!(validators::max_length(3)("貓貓貓").is_none());
+    assert!(validators::min_length(4)("貓貓貓").is_some());
+    assert!(validators::max_length(2)("貓貓貓").is_some());
+    assert!(validators::min_length(0)("").is_none());
+    assert!(validators::max_length(0)("").is_none());
+    assert!(validators::max_length(0)("a").is_some());
+}
+
+#[test]
+fn pattern_validation_honors_anchors_and_reports_custom_messages() {
+    let digits = validators::pattern(r"^\d{3}$", "Three digits required");
+    assert!(digits("123").is_none());
+    for value in ["", "12", "1234", "x123", "123\n"] {
+        assert_eq!(digits(value).as_deref(), Some("Three digits required"));
+    }
+    assert!(validators::pattern("cat", "missing")("a cat naps").is_none());
+}
+
+#[test]
+fn email_validation_rejects_missing_parts_and_whitespace() {
+    let email = validators::email();
+    for value in ["a@b.co", "first+tag@example.com"] {
+        assert!(email(value).is_none(), "{value}");
+    }
+    for value in ["", "a", "@b.co", "a@b", "a@@b.co", " a@b.co", "a@b.co\n"] {
+        assert_eq!(
+            email(value).as_deref(),
+            Some("Must be a valid email address")
+        );
+    }
+}

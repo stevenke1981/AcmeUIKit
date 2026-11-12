@@ -40,7 +40,7 @@ impl TextInput {
     /// Create a new [`TextInput`] entity.
     ///
     /// `id` is the stable [`ElementId`] for the interactive element.
-    /// `cx` is the entity-building context from [`AppContext::new`].
+    /// `cx` is the `Context<Self>` passed to the entity-building closure in `cx.new(...)`.
     pub fn new(id: impl Into<ElementId>, cx: &mut Context<Self>) -> Self {
         Self {
             id: id.into(),
