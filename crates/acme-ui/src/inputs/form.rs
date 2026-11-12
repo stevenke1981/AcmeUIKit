@@ -31,10 +31,10 @@ pub mod validators {
         })
     }
 
-    /// The value must be at least `min` characters long.
+    /// The value must be at least `min` Unicode scalar values (`char`s) long.
     pub fn min_length(min: usize) -> ValidationRule {
         Rc::new(move |value: &str| {
-            if value.len() < min {
+            if value.chars().count() < min {
                 Some(format!("Must be at least {min} characters").into())
             } else {
                 None
@@ -42,10 +42,10 @@ pub mod validators {
         })
     }
 
-    /// The value must be at most `max` characters long.
+    /// The value must be at most `max` Unicode scalar values (`char`s) long.
     pub fn max_length(max: usize) -> ValidationRule {
         Rc::new(move |value: &str| {
-            if value.len() > max {
+            if value.chars().count() > max {
                 Some(format!("Must be at most {max} characters").into())
             } else {
                 None

@@ -17,7 +17,14 @@ cargo test -p acme-ui --test pure_logic
 
 These integration tests cover HSL conversion, theme token invariants, compatibility
 between Size and ControlSizes, typography/spacing/radius/motion scales, and string
-helpers. They do not initialize GPUI or open a window. Full workspace checks also build
+helpers. Additional public API tests cover Scale mapping/inversion (including negative
+and degenerate domains, reversed ranges, bands and tick count clamping), ScaleType
+variants, and the required/min_length/max_length/pattern/email form validators
+(`min_length`/`max_length` count `char`s, not UTF-8 bytes). Pagination,
+masked/pin/number inputs, rating and slider calculations are private or only observable
+through rendering; FormMessage has no public validation query, and
+validation_border_color needs `App`; none of these are covered by the headless tests.
+They do not initialize GPUI or open a window. Full workspace checks also build
 Gallery's GPUI platform backend, which requires the native development packages
 listed in README. Passing these
 tests does not validate rendering, assistive technology, or OS preference detection.
